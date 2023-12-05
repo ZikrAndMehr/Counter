@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Counter</string>
+
+    <!-- MainActivity -->
+    <string name="counter_home">Counter</string>
+    <string name="counter_list">List</string>
+    <string name="counter_settings">Settings</string>
+
+</resources>
