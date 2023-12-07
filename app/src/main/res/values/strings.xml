@@ -7,4 +7,7 @@
     <string name="counter_list">List</string>
     <string name="counter_settings">Settings</string>
 
+    <!-- InsertCounterUseCase -->
+    <string name="empty_counter_name">Counter name can not be empty!</string>
+
 </resources>

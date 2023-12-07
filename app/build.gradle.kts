@@ -1,6 +1,12 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+
+    //KotlinSymbolProcessing
+    id("com.google.devtools.ksp")
+
+    //Hilt
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -70,4 +76,20 @@ dependencies {
     //Navigation
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.5")
+
+    //Room
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+
+    //Hilt
+    val dagger_hilt_version = "2.48"
+    implementation("com.google.dagger:hilt-android:$dagger_hilt_version")
+    ksp("com.google.dagger:hilt-android-compiler:$dagger_hilt_version")
+
+    val android_hilt_version = "1.1.0"
+    implementation ("androidx.hilt:hilt-navigation-compose:$android_hilt_version")
+    ksp("androidx.hilt:hilt-compiler:$android_hilt_version")
 }
