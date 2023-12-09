@@ -2,6 +2,12 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="PreviewCircleButton">
+        <State />
+      </entry>
+      <entry key="PreviewCounterGridItem">
+        <State />
+      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -15,7 +21,7 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2023-12-05T09:52:43.931059Z" />
+          <timeTargetWasSelectedWithDropDown value="2023-12-09T14:25:03.113973Z" />
         </State>
       </entry>
     </value>
