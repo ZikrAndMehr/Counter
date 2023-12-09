@@ -6,7 +6,7 @@ import com.zikrcode.counter.data.data_source.CounterDatabase
 import com.zikrcode.counter.data.repository.CounterRepositoryImpl
 import com.zikrcode.counter.domain.repository.CounterRepository
 import com.zikrcode.counter.domain.use_case.AllCountersUseCase
-import com.zikrcode.counter.domain.use_case.CounterByNameUseCase
+import com.zikrcode.counter.domain.use_case.CounterByIdUseCase
 import com.zikrcode.counter.domain.use_case.CounterUseCases
 import com.zikrcode.counter.domain.use_case.DeleteCounterUseCase
 import com.zikrcode.counter.domain.use_case.InsertCounterUseCase
@@ -40,7 +40,7 @@ object AppModule {
     @Singleton
     fun provideCounterUseCases(counterRepository: CounterRepository): CounterUseCases {
         return CounterUseCases(
-            CounterByNameUseCase(counterRepository),
+            CounterByIdUseCase(counterRepository),
             AllCountersUseCase(counterRepository),
             InsertCounterUseCase(counterRepository),
             DeleteCounterUseCase(counterRepository)

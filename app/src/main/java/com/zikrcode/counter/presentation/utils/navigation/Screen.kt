@@ -1,4 +1,4 @@
-package com.zikrcode.counter.presentation.utils
+package com.zikrcode.counter.presentation.utils.navigation
 
 sealed class Screen(val route: String) {
 
@@ -7,4 +7,6 @@ sealed class Screen(val route: String) {
     object CounterListScreen: Screen("counter_list_screen")
 
     object CounterSettingsScreen: Screen("counter_settings_screen")
+
+    object AddEditCounterScreen : Screen("add_edit_counter_screen")
 }

@@ -28,18 +28,17 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.zikrcode.counter.R
-import com.zikrcode.counter.presentation.counter_home.CounterHomeScreen
-import com.zikrcode.counter.presentation.counter_list.CounterListScreen
-import com.zikrcode.counter.presentation.counter_settings.CounterSettingsScreen
 import com.zikrcode.counter.presentation.utils.BottomNavigationItem
-import com.zikrcode.counter.presentation.utils.Screen
+import com.zikrcode.counter.presentation.utils.Dimens
+import com.zikrcode.counter.presentation.utils.navigation.MainNavigationGraph
+import com.zikrcode.counter.presentation.utils.navigation.Screen
 import com.zikrcode.counter.ui.theme.CounterTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +66,7 @@ class MainActivity : ComponentActivity() {
     device = Devices.PHONE
 )
 @Composable
-fun GreetingPreview() {
+fun MainActivityPreview() {
     CounterTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -79,7 +78,7 @@ fun GreetingPreview() {
 }
 
 @Composable
-fun ComponentActivity.ConfigureSystemUi() {
+private fun ComponentActivity.ConfigureSystemUi() {
     val darkTheme = isSystemInDarkTheme()
     val statusBarColor = MaterialTheme.colorScheme.background.toArgb()
     val navigationBarColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp).toArgb()
@@ -125,28 +124,18 @@ fun MainActivityContent() {
             BottomNavigationBar(navController)
         }
     ) {
-        NavHost(
+        MainNavigationGraph(
             navController = navController,
-            startDestination = Screen.CounterHomeScreen.route,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-        ) {
-            composable(Screen.CounterHomeScreen.route) {
-                CounterHomeScreen(navController)
-            }
-            composable(Screen.CounterListScreen.route) {
-                CounterListScreen(navController)
-            }
-            composable(Screen.CounterSettingsScreen.route) {
-                CounterSettingsScreen(navController)
-            }
-        }
+                .padding(Dimens.SpacingSingle)
+        )
     }
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+private fun BottomNavigationBar(navController: NavController) {
     val bottomNavigationItems = listOf(
         BottomNavigationItem(
             route = Screen.CounterHomeScreen.route,
@@ -170,37 +159,41 @@ fun BottomNavigationBar(navController: NavController) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    val bottomBarDestination = bottomNavigationItems.any { currentRoute?.contains(it.route) ?: false }
 
-    NavigationBar {
-        bottomNavigationItems.forEach { bottomNavigationItem ->
-            NavigationBarItem(
-                selected = currentRoute == bottomNavigationItem.route,
-                onClick = {
-                    if (currentRoute != bottomNavigationItem.route) {
-                        navController.navigate(bottomNavigationItem.route) {
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
+    if (bottomBarDestination) {
+        NavigationBar {
+            bottomNavigationItems.forEach { bottomNavigationItem ->
+                val isSelected = currentRoute?.contains(bottomNavigationItem.route) ?: false
+                NavigationBarItem(
+                    selected = isSelected,
+                    onClick = {
+                        if (currentRoute != bottomNavigationItem.route) {
+                            navController.navigate(bottomNavigationItem.route) {
+                                navController.graph.startDestinationRoute?.let { route ->
+                                    popUpTo(route) {
+                                        saveState = true
+                                    }
                                 }
+                                restoreState = true
                             }
-                            restoreState = true
                         }
+                    },
+                    icon = {
+                        Icon(
+                            painter = if (isSelected) {
+                                bottomNavigationItem.selectedIcon
+                            } else {
+                                bottomNavigationItem.unselectedIcon
+                            },
+                            contentDescription = bottomNavigationItem.title
+                        )
+                    },
+                    label = {
+                        Text(text = bottomNavigationItem.title)
                     }
-                },
-                icon = {
-                    Icon(
-                        painter = if (currentRoute == bottomNavigationItem.route) {
-                            bottomNavigationItem.selectedIcon
-                        } else {
-                            bottomNavigationItem.unselectedIcon
-                        },
-                        contentDescription = bottomNavigationItem.title
-                    )
-                },
-                label = {
-                    Text(text = bottomNavigationItem.title)
-                }
-            )
+                )
+            }
         }
     }
 }

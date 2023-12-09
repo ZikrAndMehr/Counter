@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CounterDao {
 
-    @Query("SELECT * FROM counter WHERE counter_name = :counterName")
-    suspend fun counterByName(counterName: String): Counter?
+    @Query("SELECT * FROM counter WHERE id = :id")
+    suspend fun counterById(id: Int): Counter?
 
     @Query("SELECT * FROM counter")
     fun allCounters(): Flow<List<Counter>>
