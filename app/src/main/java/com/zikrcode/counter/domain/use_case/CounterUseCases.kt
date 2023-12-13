@@ -4,5 +4,7 @@ data class CounterUseCases(
     val counterByIdUseCase: CounterByIdUseCase,
     val allCountersUseCase: AllCountersUseCase,
     val insertCounterUseCase: InsertCounterUseCase,
-    val deleteCounterUseCase: DeleteCounterUseCase
+    val deleteCounterUseCase: DeleteCounterUseCase,
+    val readUserPreferenceUseCase: ReadUserPreferenceUseCase,
+    val writeUserPreferenceUseCase: WriteUserPreferenceUseCase
 )

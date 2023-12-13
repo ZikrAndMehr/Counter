@@ -5,6 +5,10 @@ import com.zikrcode.counter.domain.utils.CounterOrder
 
 sealed class CounterListEvent {
 
+    data class SelectCounter(val counter: Counter) : CounterListEvent()
+
+    object NewCounter : CounterListEvent()
+
     data class Order(val counterOrder: CounterOrder) : CounterListEvent()
 
     data class Delete(val counter: Counter) : CounterListEvent()

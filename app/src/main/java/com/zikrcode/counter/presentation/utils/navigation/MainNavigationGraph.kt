@@ -1,5 +1,7 @@
 package com.zikrcode.counter.presentation.utils.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -20,7 +22,9 @@ fun MainNavigationGraph(
     NavHost(
         navController = navController,
         startDestination = Screen.CounterHomeScreen.route,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = { fadeIn() },
+        exitTransition = { fadeOut() }
     ) {
         composable(
             route = Screen.CounterHomeScreen.route + "?counterId={counterId}",
@@ -31,10 +35,11 @@ fun MainNavigationGraph(
                 }
             )
         ) { navBackStackEntry ->
-            val counterId = navBackStackEntry.arguments?.getInt("counterId")
+            val isCounterEdited = navBackStackEntry.savedStateHandle.get<Boolean>("isCounterEdited")
+                ?: false
             CounterHomeScreen(
                 navController = navController,
-                counterId = counterId
+                isCounterEdited = isCounterEdited
             )
         }
         composable(Screen.CounterListScreen.route) {
@@ -43,18 +48,16 @@ fun MainNavigationGraph(
         composable(Screen.CounterSettingsScreen.route) {
             CounterSettingsScreen(navController)
         }
-
         composable(
-            route = Screen.AddEditCounterScreen.route +
-                    "?title={title}&?counterId={counterId}",
+            route = Screen.AddEditCounterScreen.route + "?title={title}&counterId={counterId}",
             arguments = listOf(
                 navArgument(name = "title") {
                     type = NavType.StringType
                     nullable = true
                 },
                 navArgument(name = "counterId") {
-                    type = NavType.StringType
-                    nullable = true
+                    type = NavType.IntType
+                    defaultValue = -1
                 }
             )
         ) { navBackStackEntry ->
@@ -66,4 +69,3 @@ fun MainNavigationGraph(
         }
     }
 }
-

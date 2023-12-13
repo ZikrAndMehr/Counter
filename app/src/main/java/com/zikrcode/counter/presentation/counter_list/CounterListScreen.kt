@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,34 +21,50 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.zikrcode.counter.R
 import com.zikrcode.counter.domain.model.Counter
 import com.zikrcode.counter.presentation.counter_list.component.CounterGridItem
 import com.zikrcode.counter.presentation.utils.Dimens
 import com.zikrcode.counter.presentation.utils.navigation.Screen
+import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CounterListScreen(
     navController: NavController,
     viewModel: CounterListViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
-    Scaffold(
-        floatingActionButton = {
-            CounterListScreenFAB(navController)
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .consumeWindowInsets(it)
-                .padding(Dimens.SpacingSingle)
-        ) {
-            CounterListStaggeredGrid(counters = state.allCounters)
+    LaunchedEffect(true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when(event) {
+                is CounterListViewModel.UiEvent.ShowSnackbar -> {
+
+                }
+                is CounterListViewModel.UiEvent.CounterSelected -> {
+                    navController.navigate(
+                        Screen.CounterHomeScreen.route + "?counterId=${event.counter.id}"
+                    ) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+                is CounterListViewModel.UiEvent.CreateNewCounter -> {
+                    navController.navigate(
+                        Screen.AddEditCounterScreen.route
+                    )
+                }
+            }
         }
     }
+
+    val state = viewModel.state.value
+
+    CounterListContent(
+        state = state,
+        onEventClick = viewModel::onEvent
+    )
 }
 
 @Preview(
@@ -56,18 +73,46 @@ fun CounterListScreen(
     device = Devices.PHONE
 )
 @Composable
-fun CounterListScreenPreview() {
-    CounterListScreen(rememberNavController())
+fun CounterListContentPreview() {
+    CounterListContent(
+        state = CounterListState(),
+        onEventClick = { }
+    )
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CounterListContent(
+    state: CounterListState,
+    onEventClick: (CounterListEvent) -> Unit
+) {
+    Scaffold(
+        floatingActionButton = {
+            CounterListScreenFAB {
+                onEventClick(CounterListEvent.NewCounter)
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .consumeWindowInsets(it)
+                .padding(Dimens.SpacingSingle)
+        ) {
+            CounterListStaggeredGrid(
+                counters = state.allCounters,
+                onSelectCounter = onEventClick
+            )
+        }
+    }
 }
 
 @Composable
 private fun CounterListScreenFAB(
-    navController: NavController
+    onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = {
-            navController.navigate(Screen.AddEditCounterScreen.route)
-        },
+        onClick = onClick,
         containerColor = MaterialTheme.colorScheme.primary
     ) {
         Icon(
@@ -78,7 +123,10 @@ private fun CounterListScreenFAB(
 }
 
 @Composable
-private fun CounterListStaggeredGrid(counters: List<Counter>) {
+private fun CounterListStaggeredGrid(
+    counters: List<Counter>,
+    onSelectCounter: (CounterListEvent) -> Unit
+) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2)
     ) {
@@ -86,7 +134,9 @@ private fun CounterListStaggeredGrid(counters: List<Counter>) {
             CounterGridItem(
                 counter = counter
             ) {
-
+                onSelectCounter(
+                    CounterListEvent.SelectCounter(counter)
+                )
             }
         }
     }

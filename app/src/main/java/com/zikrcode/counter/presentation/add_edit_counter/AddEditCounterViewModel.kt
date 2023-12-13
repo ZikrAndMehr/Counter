@@ -31,6 +31,9 @@ class AddEditCounterViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    var isCounterEdited: Boolean = false
+        private set
+
     init {
         savedStateHandle.get<Int>("counterId")?.let { counterId ->
             if (counterId != -1) {
@@ -50,9 +53,11 @@ class AddEditCounterViewModel @Inject constructor(
         when (addEditCounterEvent) {
             is AddEditCounterEvent.EnteredName -> {
                 _counterName.value = addEditCounterEvent.value
+                isCounterEdited = true
             }
             is AddEditCounterEvent.EnteredDescription -> {
                 _counterDescription.value = addEditCounterEvent.value
+                isCounterEdited = true
             }
             AddEditCounterEvent.Cancel -> {
                 _counterName.value = ""

@@ -27,4 +27,11 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
 
+    <!-- NoCounterSelected -->
+    <string name="no_counter_selected">Please select counter from counter list to continue</string>
+
+
+    <!-- CounterHomeScreen -->
+    <string name="edit_counter">Edit counter</string>
+
 </resources>
