@@ -1,7 +1,7 @@
 package com.zikrcode.counter.presentation
 
 import android.os.Build
-import  android.os.Bundle
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -48,31 +47,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CounterTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ConfigureSystemUi()
-                    MainActivityContent()
-                }
+                ConfigureSystemUi()
+                MainActivityContent()
             }
-        }
-    }
-}
-
-@Preview(
-    showSystemUi = true,
-    showBackground = true,
-    device = Devices.PHONE
-)
-@Composable
-fun MainActivityPreview() {
-    CounterTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            MainActivityContent()
         }
     }
 }
@@ -114,12 +91,24 @@ private fun ComponentActivity.ConfigureSystemUi() {
     }
 }
 
+@Preview(
+    showSystemUi = true,
+    showBackground = true,
+    device = Devices.PHONE
+)
+@Composable
+fun MainActivityContentPreview() {
+    CounterTheme {
+        MainActivityContent()
+    }
+}
+
 @Composable
 fun MainActivityContent() {
-
     val navController = rememberNavController()
 
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         bottomBar = {
             BottomNavigationBar(navController)
         }

@@ -40,6 +40,6 @@ fun DecrementButton(
 
 @Preview
 @Composable
-fun PreviewDecrementButton() {
+fun DecrementButtonPreview() {
     DecrementButton { }
 }

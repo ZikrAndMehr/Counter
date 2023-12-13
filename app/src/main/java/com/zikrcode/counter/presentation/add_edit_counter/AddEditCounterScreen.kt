@@ -16,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.zikrcode.counter.R
 import com.zikrcode.counter.presentation.add_edit_counter.component.AddEditCounterForm
 import com.zikrcode.counter.presentation.utils.Dimens
@@ -50,25 +51,62 @@ fun AddEditCounterScreen(
                 }
                 is AddEditCounterViewModel.UiEvent.CounterSaved,
                 is  AddEditCounterViewModel.UiEvent.CounterCanceled -> {
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        "isCounterEdited", viewModel.isCounterEdited
+                    )
                     navController.navigateUp()
                 }
             }
         }
     }
 
+    AddEditCounterContent(
+        snackbarHostState = snackbarHostState,
+        title = title,
+        counterNameState = viewModel.counterName,
+        counterDescriptionState = viewModel.counterDescription,
+        onNavigateBackClick = navController::navigateUp,
+        onEventClick = viewModel::onEvent
+    )
+}
+
+@Preview(
+    showSystemUi = true,
+    showBackground = true,
+    device = Devices.PHONE
+)
+@Composable
+fun AddEditCounterContentPreview() {
+    AddEditCounterContent(
+        snackbarHostState = SnackbarHostState(),
+        title = null,
+        counterNameState = remember { mutableStateOf("") },
+        counterDescriptionState = remember { mutableStateOf("") },
+        onNavigateBackClick = { },
+        onEventClick = { }
+    )
+}
+
+@Composable
+private fun AddEditCounterContent(
+    snackbarHostState: SnackbarHostState,
+    title: String?,
+    counterNameState: State<String>,
+    counterDescriptionState: State<String>,
+    onNavigateBackClick: () -> Unit,
+    onEventClick: (AddEditCounterEvent) -> Unit
+) {
     Scaffold(
         modifier = Modifier.consumeWindowInsets(WindowInsets.systemBars),
         topBar = {
             AddEditCounterTopAppBar(
-                onGoBackClick = {
-                    navController.navigateUp()
-                },
+                onGoBackClick = onNavigateBackClick,
                 title = title ?: stringResource(R.string.new_counter),
                 onCancelClick = {
-                    viewModel.onEvent(AddEditCounterEvent.Cancel)
+                    onEventClick(AddEditCounterEvent.Cancel)
                 },
                 onSaveClick = {
-                    viewModel.onEvent(AddEditCounterEvent.Save)
+                    onEventClick(AddEditCounterEvent.Save)
                 }
             )
         },
@@ -84,31 +122,21 @@ fun AddEditCounterScreen(
                 .padding(Dimens.SpacingSingle)
         ) {
             AddEditCounterForm(
-                counterNameState = viewModel.counterName,
+                counterNameState = counterNameState,
                 onCounterNameChange = { counterName ->
-                    viewModel.onEvent(
+                    onEventClick(
                         AddEditCounterEvent.EnteredName(counterName)
                     )
                 },
-                counterDescriptionState = viewModel.counterDescription,
+                counterDescriptionState = counterDescriptionState,
                 onCounterDescriptionChange = { counterDescription ->
-                    viewModel.onEvent(
+                    onEventClick(
                         AddEditCounterEvent.EnteredDescription(counterDescription)
                     )
                 }
             )
         }
     }
-}
-
-@Preview(
-    showSystemUi = true,
-    showBackground = true,
-    device = Devices.PHONE
-)
-@Composable
-fun AddEditCounterScreenPreview() {
-    AddEditCounterScreen(rememberNavController(), null)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -52,6 +52,6 @@ fun CircleButton(
 
 @Preview
 @Composable
-fun PreviewCircleButton() {
+fun CircleButtonPreview() {
     CircleButton {  }
 }

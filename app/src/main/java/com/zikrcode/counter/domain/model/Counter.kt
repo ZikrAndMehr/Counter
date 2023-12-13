@@ -14,7 +14,7 @@ data class Counter(
 ) {
     companion object {
         fun instance() = Counter(
-            counterName = "Counter",
+            counterName = "Counter 123456789",
             counterDescription = "A counter is a device which stores the number of times a" +
                     " particular event or process has occurred",
             counterDate = 0L,

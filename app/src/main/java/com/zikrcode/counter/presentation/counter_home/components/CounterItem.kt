@@ -97,7 +97,7 @@ fun CounterItem(
 
 @Preview
 @Composable
-fun PreviewCounterItem() {
+fun CounterItemPreview() {
     CounterItem(
         counter = Counter.instance(),
         onEditClick = { },
