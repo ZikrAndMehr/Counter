@@ -10,6 +10,15 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile =
+                file("/Users/zokirjon/Main/AndroidStudioProjects/Android Keystore/ZikrCodeAndroidKeyStore.jks")
+            storePassword = "z2o3k0i9r2j0o0n3"
+            keyPassword = "z2o3k0i9r2j0o0n3"
+            keyAlias = "counter"
+        }
+    }
     namespace = "com.zikrcode.counter"
     compileSdk = 34
 
@@ -33,6 +42,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

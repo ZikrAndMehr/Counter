@@ -9,6 +9,7 @@
 
     <!-- InsertCounterUseCase -->
     <string name="empty_counter_name">Counter name can not be empty!</string>
+    <string name="invalid_counter_value">Invalid counter value!</string>
 
     <!-- CounterItem -->
     <string name="edit">Edit</string>
@@ -19,6 +20,7 @@
 
     <!-- AddCounterForm -->
     <string name="counter_name">Name</string>
+    <string name="counter_value">Value</string>
     <string name="counter_description">Description</string>
 
     <!-- AddEditCounterScreen -->
@@ -33,5 +35,11 @@
 
     <!-- CounterHomeScreen -->
     <string name="edit_counter">Edit counter</string>
+
+    <!-- CounterGridItem -->
+    <string name="delete">Delete</string>
+
+    <!-- CounterListViewModel -->
+    <string name="current_counter_in_use">Current counter is in use!</string>
 
 </resources>

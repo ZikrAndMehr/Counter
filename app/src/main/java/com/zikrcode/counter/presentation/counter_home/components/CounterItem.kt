@@ -41,7 +41,7 @@ fun CounterItem(
                 .fillMaxWidth()
                 .padding(
                     start = Dimens.SpacingDouble,
-                    top = Dimens.SpacingDouble,
+                    top = Dimens.SpacingSingle,
                     end = Dimens.SpacingDouble,
                 ),
             verticalAlignment = Alignment.CenterVertically

@@ -2,11 +2,15 @@ package com.zikrcode.counter.presentation.counter_home
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zikrcode.counter.domain.model.Counter
 import com.zikrcode.counter.domain.use_case.CounterUseCases
+import com.zikrcode.counter.presentation.utils.AppConstants.COUNTER_VALUE_RANGE
+import com.zikrcode.counter.presentation.utils.AppConstants.LAST_USED_COUNTER_ID_KEY
+import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -33,11 +37,14 @@ class CounterHomeViewModel @Inject constructor(
     }
 
     private fun loadCounter() {
-        savedStateHandle.get<Int>("counterId")?.let { counterId ->
-            if (counterId != -1) {
-                viewModelScope.launch {
-                    _counter.value = counterUseCases.counterByIdUseCase(counterId)
-                }
+        viewModelScope.launch {
+            val counterId = savedStateHandle.get<Int>(COUNTER_ID_ARG)
+                ?.takeIf { it != -1 }
+                ?: counterUseCases.readUserPreferenceUseCase(
+                    intPreferencesKey(LAST_USED_COUNTER_ID_KEY)
+                )
+            counterId?.let {
+                _counter.value = counterUseCases.counterByIdUseCase(it)
             }
         }
     }
@@ -58,18 +65,26 @@ class CounterHomeViewModel @Inject constructor(
                 saveCounter()
             }
             is CounterHomeEvent.Increment -> {
-                _counter.value = counter.value?.copy(
-                    counterSavedValue = counter.value?.counterSavedValue?.plus(1) ?: 0
-                )
-                saveCounter()
+                counter.value?.let { counter ->
+                    if (counter.counterSavedValue + 1 in COUNTER_VALUE_RANGE) {
+                        _counter.value = counter.copy(
+                            counterSavedValue = counter.counterSavedValue.plus(1)
+                        )
+                        saveCounter()
+                    }
+                }
             }
             is CounterHomeEvent.Decrement -> {
-                _counter.value = counter.value?.copy(
-                    counterSavedValue = counter.value?.counterSavedValue?.minus(1) ?: 0
-                )
-                saveCounter()
+                counter.value?.let { counter ->
+                    if (counter.counterSavedValue - 1 in COUNTER_VALUE_RANGE) {
+                        _counter.value = counter.copy(
+                            counterSavedValue = counter.counterSavedValue.minus(1)
+                        )
+                        saveCounter()
+                    }
+                }
             }
-            is CounterHomeEvent.CounterEdited -> {
+            is CounterHomeEvent.Update -> {
                 loadCounter()
             }
         }
@@ -83,6 +98,8 @@ class CounterHomeViewModel @Inject constructor(
     }
 
     sealed class UiEvent {
+
+        object NoCounter : UiEvent()
 
         data class EditCounter(val counter: Counter) : UiEvent()
     }

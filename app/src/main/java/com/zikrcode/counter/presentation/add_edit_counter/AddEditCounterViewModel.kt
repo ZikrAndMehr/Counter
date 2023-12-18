@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.zikrcode.counter.domain.model.Counter
 import com.zikrcode.counter.domain.use_case.CounterUseCases
 import com.zikrcode.counter.presentation.utils.UiText
+import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -20,13 +21,16 @@ class AddEditCounterViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private var currentCounterId: Int? = null
+
     private val _counterName = mutableStateOf("")
     val counterName: State<String> = _counterName
 
     private val _counterDescription = mutableStateOf("")
     val counterDescription: State<String> = _counterDescription
 
-    private var currentCounterId: Int? = null
+    private val _counterValue = mutableStateOf("")
+    val counterValue: State<String> = _counterValue
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -35,13 +39,14 @@ class AddEditCounterViewModel @Inject constructor(
         private set
 
     init {
-        savedStateHandle.get<Int>("counterId")?.let { counterId ->
+        savedStateHandle.get<Int>(COUNTER_ID_ARG)?.let { counterId ->
             if (counterId != -1) {
                 viewModelScope.launch {
                     counterUseCases.counterByIdUseCase(counterId)?.also { counter ->
                         currentCounterId = counter.id
                         _counterName.value = counter.counterName
                         _counterDescription.value = counter.counterDescription
+                        _counterValue.value = counter.counterSavedValue.toString()
                     }
                 }
             }
@@ -53,6 +58,10 @@ class AddEditCounterViewModel @Inject constructor(
         when (addEditCounterEvent) {
             is AddEditCounterEvent.EnteredName -> {
                 _counterName.value = addEditCounterEvent.value
+                isCounterEdited = true
+            }
+            is AddEditCounterEvent.EnteredValue -> {
+                _counterValue.value = addEditCounterEvent.value
                 isCounterEdited = true
             }
             is AddEditCounterEvent.EnteredDescription -> {
@@ -74,7 +83,7 @@ class AddEditCounterViewModel @Inject constructor(
                             counterName = counterName.value,
                             counterDescription = counterDescription.value,
                             counterDate = System.currentTimeMillis(),
-                            counterSavedValue = 0
+                            counterSavedValue = counterValue.value.toIntOrNull() ?: 0
                         )
                     )
 
