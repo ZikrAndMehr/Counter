@@ -2,17 +2,21 @@ package com.zikrcode.counter.presentation.counter_list
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zikrcode.counter.R
 import com.zikrcode.counter.domain.model.Counter
 import com.zikrcode.counter.domain.use_case.CounterUseCases
 import com.zikrcode.counter.domain.utils.CounterOrder
 import com.zikrcode.counter.domain.utils.OrderType
+import com.zikrcode.counter.presentation.utils.AppConstants.LAST_USED_COUNTER_ID_KEY
 import com.zikrcode.counter.presentation.utils.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -49,9 +53,42 @@ class CounterListViewModel @Inject constructor(
 
     fun onEvent(counterListEvent: CounterListEvent) {
         when (counterListEvent) {
+            is CounterListEvent.ToggleOrderSection -> {
+
+            }
+            is CounterListEvent.Order -> {
+
+            }
             is CounterListEvent.SelectCounter -> {
                 viewModelScope.launch {
-                    _eventFlow.emit(UiEvent.CounterSelected(counterListEvent.counter))
+                    counterListEvent.counter.id?.let {
+                        counterUseCases.writeUserPreferenceUseCase(
+                            key = intPreferencesKey(LAST_USED_COUNTER_ID_KEY),
+                            value = it
+                        )
+                        _eventFlow.emit(UiEvent.CounterSelected(counterListEvent.counter))
+                    }
+                }
+            }
+            is CounterListEvent.Delete -> {
+                viewModelScope.launch {
+                    val currentCounterId = counterUseCases.readUserPreferenceUseCase(
+                        intPreferencesKey(LAST_USED_COUNTER_ID_KEY)
+                    ).first()
+                    if (counterListEvent.counter.id == currentCounterId) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(
+                                UiText.StringResource(R.string.current_counter_in_use)
+                            )
+                        )
+                    } else {
+                        counterUseCases.deleteCounterUseCase(counterListEvent.counter)
+                    }
+                }
+            }
+            is CounterListEvent.Edit -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(UiEvent.EditCounter(counterListEvent.counter))
                 }
             }
             is CounterListEvent.NewCounter -> {
@@ -59,16 +96,7 @@ class CounterListViewModel @Inject constructor(
                     _eventFlow.emit(UiEvent.CreateNewCounter)
                 }
             }
-            is CounterListEvent.Order -> {
-
-            }
-            is CounterListEvent.Delete -> {
-
-            }
             is CounterListEvent.RestoreCounter -> {
-
-            }
-            is CounterListEvent.ToggleOrderSection -> {
 
             }
         }
@@ -79,6 +107,8 @@ class CounterListViewModel @Inject constructor(
         data class ShowSnackbar(val message: UiText) : UiEvent()
 
         data class CounterSelected(val counter: Counter) : UiEvent()
+
+        data class EditCounter(val counter: Counter) : UiEvent()
 
         object CreateNewCounter : UiEvent()
     }

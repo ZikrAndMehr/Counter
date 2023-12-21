@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import com.zikrcode.counter.R
 import com.zikrcode.counter.presentation.add_edit_counter.component.AddEditCounterForm
 import com.zikrcode.counter.presentation.utils.Dimens
+import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.UPDATE_COUNTER_ARG
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -52,7 +53,7 @@ fun AddEditCounterScreen(
                 is AddEditCounterViewModel.UiEvent.CounterSaved,
                 is  AddEditCounterViewModel.UiEvent.CounterCanceled -> {
                     navController.previousBackStackEntry?.savedStateHandle?.set(
-                        "isCounterEdited", viewModel.isCounterEdited
+                        UPDATE_COUNTER_ARG, viewModel.isCounterEdited
                     )
                     navController.navigateUp()
                 }
@@ -64,6 +65,7 @@ fun AddEditCounterScreen(
         snackbarHostState = snackbarHostState,
         title = title,
         counterNameState = viewModel.counterName,
+        counterValueState = viewModel.counterValue,
         counterDescriptionState = viewModel.counterDescription,
         onNavigateBackClick = navController::navigateUp,
         onEventClick = viewModel::onEvent
@@ -82,6 +84,7 @@ fun AddEditCounterContentPreview() {
         title = null,
         counterNameState = remember { mutableStateOf("") },
         counterDescriptionState = remember { mutableStateOf("") },
+        counterValueState = remember { mutableStateOf("") },
         onNavigateBackClick = { },
         onEventClick = { }
     )
@@ -92,6 +95,7 @@ private fun AddEditCounterContent(
     snackbarHostState: SnackbarHostState,
     title: String?,
     counterNameState: State<String>,
+    counterValueState: State<String>,
     counterDescriptionState: State<String>,
     onNavigateBackClick: () -> Unit,
     onEventClick: (AddEditCounterEvent) -> Unit
@@ -132,6 +136,12 @@ private fun AddEditCounterContent(
                 onCounterDescriptionChange = { counterDescription ->
                     onEventClick(
                         AddEditCounterEvent.EnteredDescription(counterDescription)
+                    )
+                },
+                counterValueState = counterValueState,
+                onCounterValueChange = { counterValue ->
+                    onEventClick(
+                        AddEditCounterEvent.EnteredValue(counterValue)
                     )
                 }
             )

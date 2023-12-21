@@ -41,11 +41,23 @@ fun CounterItem(
                 .fillMaxWidth()
                 .padding(
                     start = Dimens.SpacingDouble,
-                    top = Dimens.SpacingDouble,
+                    top = Dimens.SpacingSingle,
                     end = Dimens.SpacingDouble,
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(
+                onClick = onResetClick,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(Dimens.SpacingQuintuple)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_reset),
+                    contentDescription = stringResource(R.string.reset)
+                )
+            }
             Text(
                 text = counter.counterName,
                 modifier = Modifier
@@ -66,19 +78,6 @@ fun CounterItem(
                 Icon(
                     painter = painterResource(R.drawable.ic_edit),
                     contentDescription = stringResource(R.string.edit)
-                )
-            }
-            Spacer(Modifier.width(Dimens.SpacingSingle))
-            IconButton(
-                onClick = onResetClick,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(Dimens.SpacingQuintuple)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_reset),
-                    contentDescription = stringResource(R.string.reset)
                 )
             }
         }

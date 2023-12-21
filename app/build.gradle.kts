@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,6 +10,11 @@ plugins {
     //Hilt
     id("dagger.hilt.android.plugin")
 }
+
+//SecretPropertiesFile
+val secretPropertiesFile = project.rootProject.file("secret.properties")
+val secretProperties = Properties()
+secretProperties.load(secretPropertiesFile.inputStream())
 
 android {
     namespace = "com.zikrcode.counter"
@@ -26,6 +33,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(secretProperties["storeFile"] as String)
+            storePassword = secretProperties["storePassword"] as String
+            keyPassword = secretProperties["keyPassword"] as String
+            keyAlias = secretProperties["keyAlias"] as String
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,6 +49,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

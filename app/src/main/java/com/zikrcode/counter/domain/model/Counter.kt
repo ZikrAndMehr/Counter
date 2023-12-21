@@ -13,12 +13,7 @@ data class Counter(
     @ColumnInfo(name = "counter_saved_value") val counterSavedValue: Int
 ) {
     companion object {
-        fun instance() = Counter(
-            counterName = "Counter 123456789",
-            counterDescription = "A counter is a device which stores the number of times a" +
-                    " particular event or process has occurred",
-            counterDate = 0L,
-            counterSavedValue = 0
-        )
+
+        fun instance() = Counter(counterName = "Coding", counterDescription = "Coding sessions", counterDate = System.currentTimeMillis(), counterSavedValue = 50)
     }
 }

@@ -7,31 +7,49 @@
     <string name="counter_list">List</string>
     <string name="counter_settings">Settings</string>
 
+        <!-- CounterHomeScreen -->
+        <string name="edit_counter">Edit counter</string>
+
+            <!-- NoCounterSelected -->
+            <string name="no_counter_selected">Please select counter from counter list to continue</string>
+
+            <!-- CounterItem -->
+            <string name="edit">Edit</string>
+            <string name="reset">Reset</string>
+
+        <!-- CounterListScreen -->
+        <string name="add">Add</string>
+
+            <!-- CounterListViewModel -->
+            <string name="current_counter_in_use">Current counter is in use!</string>
+
+            <!-- CounterGridItem -->
+            <string name="delete">Delete</string>
+
+        <!-- AddEditCounterScreen -->
+        <string name="new_counter">New counter</string>
+        <string name="go_back">Go back</string>
+        <string name="cancel">Cancel</string>
+        <string name="save">Save</string>
+
+            <!-- AddCounterForm -->
+            <string name="counter_name">Name</string>
+            <string name="counter_value">Value</string>
+            <string name="counter_description">Description</string>
+
+
+        <!-- CounterSettingsScreen -->
+        <string name="vibrate_on_tap_name">Vibrate on Tap</string>
+        <string name="vibrate_on_tap_description">Vibrate on value change</string>
+        <string name="keep_screen_on_name">Keep Screen On</string>
+        <string name="keep_screen_on_description">Keep the screen on while app is active</string>
+
+            <!-- PreferenceItem -->
+            <string name="name">Name</string>
+            <string name="description">Description</string>
+
     <!-- InsertCounterUseCase -->
     <string name="empty_counter_name">Counter name can not be empty!</string>
-
-    <!-- CounterItem -->
-    <string name="edit">Edit</string>
-    <string name="reset">Reset</string>
-
-    <!-- CounterListScreen -->
-    <string name="add">Add</string>
-
-    <!-- AddCounterForm -->
-    <string name="counter_name">Name</string>
-    <string name="counter_description">Description</string>
-
-    <!-- AddEditCounterScreen -->
-    <string name="new_counter">New counter</string>
-    <string name="go_back">Go back</string>
-    <string name="cancel">Cancel</string>
-    <string name="save">Save</string>
-
-    <!-- NoCounterSelected -->
-    <string name="no_counter_selected">Please select counter from counter list to continue</string>
-
-
-    <!-- CounterHomeScreen -->
-    <string name="edit_counter">Edit counter</string>
+    <string name="invalid_counter_value">Invalid counter value!</string>
 
 </resources>

@@ -31,7 +31,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.zikrcode.counter.R
 import com.zikrcode.counter.presentation.utils.BottomNavigationItem
-import com.zikrcode.counter.presentation.utils.Dimens
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationGraph
 import com.zikrcode.counter.presentation.utils.navigation.Screen
 import com.zikrcode.counter.ui.theme.CounterTheme
@@ -118,7 +117,6 @@ fun MainActivityContent() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(Dimens.SpacingSingle)
         )
     }
 }
