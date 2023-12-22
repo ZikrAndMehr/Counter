@@ -46,7 +46,7 @@ fun CounterHomeScreen(
     LaunchedEffect(true) {
         viewModel.eventFlow.collectLatest { event ->
             when(event) {
-                is CounterHomeViewModel.UiEvent.NoCounter -> {
+                CounterHomeViewModel.UiEvent.NoCounter -> {
                     noCounter = true
                 }
                 is CounterHomeViewModel.UiEvent.EditCounter -> {

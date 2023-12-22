@@ -95,13 +95,13 @@ class CounterHomeViewModel @Inject constructor(
                     }
                 }
             }
-            is CounterHomeEvent.Reset -> {
+            CounterHomeEvent.Reset -> {
                 _counter.value = counter.value?.copy(
                     counterSavedValue = 0
                 )
                 saveCounter()
             }
-            is CounterHomeEvent.Increment -> {
+            CounterHomeEvent.Increment -> {
                 counter.value?.let { counter ->
                     if (counter.counterSavedValue + 1 in COUNTER_VALUE_RANGE) {
                         _counter.value = counter.copy(
@@ -111,7 +111,7 @@ class CounterHomeViewModel @Inject constructor(
                     }
                 }
             }
-            is CounterHomeEvent.Decrement -> {
+            CounterHomeEvent.Decrement -> {
                 counter.value?.let { counter ->
                     if (counter.counterSavedValue - 1 in COUNTER_VALUE_RANGE) {
                         _counter.value = counter.copy(
