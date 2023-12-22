@@ -30,7 +30,6 @@ import androidx.navigation.NavController
 import com.zikrcode.counter.R
 import com.zikrcode.counter.presentation.add_edit_counter.component.AddEditCounterForm
 import com.zikrcode.counter.presentation.utils.Dimens
-import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.UPDATE_COUNTER_ARG
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -50,11 +49,9 @@ fun AddEditCounterScreen(
                         message = event.message.asString(context)
                     )
                 }
-                is AddEditCounterViewModel.UiEvent.CounterSaved,
-                is  AddEditCounterViewModel.UiEvent.CounterCanceled -> {
-                    navController.previousBackStackEntry?.savedStateHandle?.set(
-                        UPDATE_COUNTER_ARG, viewModel.isCounterEdited
-                    )
+                AddEditCounterViewModel.UiEvent.NavigateBack,
+                AddEditCounterViewModel.UiEvent.CounterSaved,
+                AddEditCounterViewModel.UiEvent.CounterCanceled -> {
                     navController.navigateUp()
                 }
             }
@@ -67,7 +64,6 @@ fun AddEditCounterScreen(
         counterNameState = viewModel.counterName,
         counterValueState = viewModel.counterValue,
         counterDescriptionState = viewModel.counterDescription,
-        onNavigateBackClick = navController::navigateUp,
         onEventClick = viewModel::onEvent
     )
 }
@@ -85,7 +81,6 @@ fun AddEditCounterContentPreview() {
         counterNameState = remember { mutableStateOf("") },
         counterDescriptionState = remember { mutableStateOf("") },
         counterValueState = remember { mutableStateOf("") },
-        onNavigateBackClick = { },
         onEventClick = { }
     )
 }
@@ -97,14 +92,15 @@ private fun AddEditCounterContent(
     counterNameState: State<String>,
     counterValueState: State<String>,
     counterDescriptionState: State<String>,
-    onNavigateBackClick: () -> Unit,
     onEventClick: (AddEditCounterEvent) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.consumeWindowInsets(WindowInsets.systemBars),
         topBar = {
             AddEditCounterTopAppBar(
-                onGoBackClick = onNavigateBackClick,
+                onGoBackClick = {
+                    onEventClick(AddEditCounterEvent.GoBack)
+                },
                 title = title ?: stringResource(R.string.new_counter),
                 onCancelClick = {
                     onEventClick(AddEditCounterEvent.Cancel)

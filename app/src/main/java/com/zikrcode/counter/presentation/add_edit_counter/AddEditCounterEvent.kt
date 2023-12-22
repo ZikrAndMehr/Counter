@@ -8,6 +8,8 @@ sealed class AddEditCounterEvent {
 
     data class EnteredDescription(val value: String) : AddEditCounterEvent()
 
+    object GoBack : AddEditCounterEvent()
+
     object Cancel : AddEditCounterEvent()
 
     object Save : AddEditCounterEvent()

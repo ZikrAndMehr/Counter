@@ -63,7 +63,7 @@ fun CounterListScreen(
                                 "?${COUNTER_ID_ARG}=${event.counter.id}"
                     )
                 }
-                is CounterListViewModel.UiEvent.CreateNewCounter -> {
+                CounterListViewModel.UiEvent.CreateNewCounter -> {
                     navController.navigate(Screen.AddEditCounterScreen.route)
                 }
             }

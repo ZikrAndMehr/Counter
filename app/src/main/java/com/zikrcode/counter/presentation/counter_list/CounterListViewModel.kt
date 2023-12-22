@@ -53,7 +53,7 @@ class CounterListViewModel @Inject constructor(
 
     fun onEvent(counterListEvent: CounterListEvent) {
         when (counterListEvent) {
-            is CounterListEvent.ToggleOrderSection -> {
+            CounterListEvent.ToggleOrderSection -> {
 
             }
             is CounterListEvent.Order -> {
@@ -91,12 +91,12 @@ class CounterListViewModel @Inject constructor(
                     _eventFlow.emit(UiEvent.EditCounter(counterListEvent.counter))
                 }
             }
-            is CounterListEvent.NewCounter -> {
+            CounterListEvent.NewCounter -> {
                 viewModelScope.launch {
                     _eventFlow.emit(UiEvent.CreateNewCounter)
                 }
             }
-            is CounterListEvent.RestoreCounter -> {
+            CounterListEvent.RestoreCounter -> {
 
             }
         }

@@ -12,6 +12,7 @@ import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COU
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,14 +36,11 @@ class AddEditCounterViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    var isCounterEdited: Boolean = false
-        private set
-
     init {
         savedStateHandle.get<Int>(COUNTER_ID_ARG)?.let { counterId ->
             if (counterId != -1) {
                 viewModelScope.launch {
-                    counterUseCases.counterByIdUseCase(counterId)?.also { counter ->
+                    counterUseCases.counterByIdUseCase(counterId).first().also { counter ->
                         currentCounterId = counter.id
                         _counterName.value = counter.counterName
                         _counterDescription.value = counter.counterDescription
@@ -58,19 +56,19 @@ class AddEditCounterViewModel @Inject constructor(
         when (addEditCounterEvent) {
             is AddEditCounterEvent.EnteredName -> {
                 _counterName.value = addEditCounterEvent.value
-                isCounterEdited = true
             }
             is AddEditCounterEvent.EnteredValue -> {
                 _counterValue.value = addEditCounterEvent.value
-                isCounterEdited = true
             }
             is AddEditCounterEvent.EnteredDescription -> {
                 _counterDescription.value = addEditCounterEvent.value
-                isCounterEdited = true
+            }
+            AddEditCounterEvent.GoBack -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(UiEvent.NavigateBack)
+                }
             }
             AddEditCounterEvent.Cancel -> {
-                _counterName.value = ""
-                _counterDescription.value = ""
                 viewModelScope.launch {
                     _eventFlow.emit(UiEvent.CounterCanceled)
                 }
@@ -100,6 +98,8 @@ class AddEditCounterViewModel @Inject constructor(
     sealed class UiEvent {
 
         data class ShowSnackbar(val message: UiText) : UiEvent()
+
+        object NavigateBack : UiEvent()
 
         object CounterCanceled : UiEvent()
 
