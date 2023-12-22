@@ -9,7 +9,7 @@ class CounterRepositoryImpl(
     private val counterDao: CounterDao
 ) : CounterRepository {
 
-    override suspend fun counterById(id: Int): Counter? {
+    override fun counterById(id: Int): Flow<Counter> {
         return counterDao.counterById(id)
     }
 

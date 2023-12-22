@@ -11,6 +11,4 @@ sealed class CounterHomeEvent {
     object Increment : CounterHomeEvent()
 
     object Decrement : CounterHomeEvent()
-
-    object Update : CounterHomeEvent()
 }

@@ -52,12 +52,23 @@ class CounterHomeViewModel @Inject constructor(
     }
 
     private fun loadCounter() {
+        var counterJob: Job? = null
+
+        fun changeCounter(id: Int) {
+            counterJob?.cancel()
+            counterJob = viewModelScope.launch {
+                counterUseCases.counterByIdUseCase(id).collectLatest {
+                    _counter.value = it
+                }
+            }
+        }
+
         viewModelScope.launch {
             counterUseCases.readUserPreferenceUseCase(
                 intPreferencesKey(LAST_USED_COUNTER_ID_KEY)
             ).collectLatest { counterId ->
                 counterId?.let {
-                    _counter.value = counterUseCases.counterByIdUseCase(it)
+                    changeCounter(it)
                 } ?: run {
                     _eventFlow.emit(UiEvent.NoCounter)
                 }
@@ -110,21 +121,15 @@ class CounterHomeViewModel @Inject constructor(
                     }
                 }
             }
-            is CounterHomeEvent.Update -> {
-                val counterId = _counter.value?.id
-                counterId?.let {
-                    viewModelScope.launch {
-                        _counter.value = counterUseCases.counterByIdUseCase(it)
-                    }
-                }
-            }
         }
     }
 
     private fun saveCounter() {
         saveCounterJob?.cancel()
         saveCounterJob = viewModelScope.launch {
-            _counter.value?.let { counterUseCases.insertCounterUseCase(it) }
+            _counter.value?.let {
+                counterUseCases.insertCounterUseCase(it)
+            }
         }
     }
 

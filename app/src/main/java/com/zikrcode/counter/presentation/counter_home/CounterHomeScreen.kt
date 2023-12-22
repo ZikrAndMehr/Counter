@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun CounterHomeScreen(
     navController: NavController,
-    updateCounter: Boolean,
     viewModel: CounterHomeViewModel = hiltViewModel()
 ) {
     var noCounter by rememberSaveable {
@@ -58,10 +57,6 @@ fun CounterHomeScreen(
                 }
             }
         }
-    }
-
-    if (updateCounter) {
-        viewModel.onEvent(CounterHomeEvent.Update)
     }
 
     if (noCounter) {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CounterRepository {
 
-    suspend fun counterById(id: Int): Counter?
+    fun counterById(id: Int): Flow<Counter>
 
     fun allCounters(): Flow<List<Counter>>
 

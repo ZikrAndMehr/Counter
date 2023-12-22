@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.TITLE_ARG
-import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.UPDATE_COUNTER_ARG
 import com.zikrcode.counter.presentation.add_edit_counter.AddEditCounterScreen
 import com.zikrcode.counter.presentation.counter_home.CounterHomeScreen
 import com.zikrcode.counter.presentation.counter_list.CounterListScreen
@@ -29,14 +28,8 @@ fun MainNavigationGraph(
         enterTransition = { fadeIn() },
         exitTransition = { fadeOut() }
     ) {
-        composable(Screen.CounterHomeScreen.route) { navBackStackEntry ->
-            val updateCounter = navBackStackEntry.savedStateHandle
-                .get<Boolean>(UPDATE_COUNTER_ARG)
-                ?: false
-            CounterHomeScreen(
-                navController = navController,
-                updateCounter = updateCounter
-            )
+        composable(Screen.CounterHomeScreen.route) {
+            CounterHomeScreen(navController)
         }
         composable(Screen.CounterListScreen.route) {
             CounterListScreen(navController)

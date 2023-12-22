@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface CounterDao {
 
     @Query("SELECT * FROM counter WHERE id = :id")
-    suspend fun counterById(id: Int): Counter?
+    fun counterById(id: Int): Flow<Counter>
 
     @Query("SELECT * FROM counter")
     fun allCounters(): Flow<List<Counter>>
