@@ -1,9 +1,6 @@
 ### AndroidStudio ###
 # Covers files to be ignored for android development using Android Studio.
 
-#Screenshot images
-images/
-
 # Built application files
 *.apk
 *.ap_
