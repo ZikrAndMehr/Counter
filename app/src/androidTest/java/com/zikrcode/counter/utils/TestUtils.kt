@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-package com.zikrcode.counter
+package com.zikrcode.counter.utils
 
-import org.junit.Test
+import com.zikrcode.counter.domain.model.Counter
 
-import org.junit.Assert.*
-
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
-    @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
-    }
-}
+val testCounters = listOf(
+    Counter(
+        id = 1,
+        counterName = "Name",
+        counterDescription = "Description",
+        counterDate = 0L,
+        counterSavedValue = 0
+    ),
+    Counter(
+        id = 2,
+        counterName = "Name",
+        counterDescription = "Description",
+        counterDate = 0L,
+        counterSavedValue = 0
+    ),
+    Counter(
+        id = 3,
+        counterName = "Name",
+        counterDescription = "Description",
+        counterDate = 0L,
+        counterSavedValue = 0
+    )
+)

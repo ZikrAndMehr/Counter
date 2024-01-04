@@ -30,6 +30,11 @@ data class Counter(
 ) {
     companion object {
 
-        fun instance() = Counter(counterName = "Coding", counterDescription = "Coding sessions", counterDate = System.currentTimeMillis(), counterSavedValue = 50)
+        fun instance() = Counter(
+            counterName = "Coding",
+            counterDescription = "Coding sessions",
+            counterDate = System.currentTimeMillis(),
+            counterSavedValue = 50
+        )
     }
 }
