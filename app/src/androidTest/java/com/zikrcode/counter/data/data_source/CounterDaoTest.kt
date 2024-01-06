@@ -2,7 +2,6 @@ package com.zikrcode.counter.data.data_source
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.zikrcode.counter.utils.testCounters
 import kotlinx.coroutines.flow.first

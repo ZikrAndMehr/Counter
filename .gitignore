@@ -70,6 +70,7 @@ obj/
 
 # User-specific configurations
 .idea/*
+!.idea/copyright
 
 # Legacy Eclipse project files
 .classpath
