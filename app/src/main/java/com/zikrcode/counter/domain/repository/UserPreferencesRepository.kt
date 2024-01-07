@@ -16,10 +16,12 @@
 
 package com.zikrcode.counter.domain.repository
 
-import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import kotlinx.coroutines.flow.Flow
 
 interface UserPreferencesRepository {
 
-    fun getDataStore(): DataStore<Preferences>
+    fun <T> readUserPreference(key: Preferences.Key<T>): Flow<T?>
+
+    suspend fun <T> writeUserPreference(key: Preferences.Key<T>, value: T)
 }

@@ -18,14 +18,25 @@ package com.zikrcode.counter.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import com.zikrcode.counter.domain.repository.UserPreferencesRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserPreferencesRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : UserPreferencesRepository {
 
-    override fun getDataStore(): DataStore<Preferences> {
-        return dataStore
+    override fun <T> readUserPreference(key: Preferences.Key<T>): Flow<T?> {
+        return dataStore.data.map { preferences ->
+            preferences[key]
+        }
+    }
+
+    override suspend fun <T> writeUserPreference(key: Preferences.Key<T>, value: T) {
+        dataStore.edit { preferences ->
+            preferences[key] = value
+        }
     }
 }

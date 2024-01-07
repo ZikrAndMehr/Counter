@@ -41,3 +41,23 @@ val testCounters = listOf(
         counterSavedValue = 0
     )
 )
+
+const val TEST_DATASTORE_NAME = "user.preferences_pb"
+
+val testPreferencesString = mapOf(
+    "S_KEY_1" to "Value1",
+    "S_KEY_2" to "Value2",
+    "S_KEY_3" to "Value3"
+)
+
+val testPreferencesInt = mapOf(
+    "I_KEY_1" to 1,
+    "I_KEY_2" to 2,
+    "I_KEY_3" to 3
+)
+
+val testPreferencesBoolean = mapOf(
+    "B_KEY_1" to true,
+    "B_KEY_2" to false,
+    "B_KEY_3" to true
+)
