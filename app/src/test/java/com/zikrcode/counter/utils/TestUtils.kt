@@ -21,23 +21,41 @@ import com.zikrcode.counter.domain.model.Counter
 val testCounters = listOf(
     Counter(
         id = 1,
-        counterName = "Name",
-        counterDescription = "Description",
-        counterDate = 0L,
-        counterSavedValue = 0
+        counterName = "AName",
+        counterDescription = "ADescription",
+        counterDate = 1L,
+        counterSavedValue = 11
     ),
     Counter(
         id = 2,
-        counterName = "Name",
-        counterDescription = "Description",
-        counterDate = 0L,
-        counterSavedValue = 0
+        counterName = "BName",
+        counterDescription = "BDescription",
+        counterDate = 2L,
+        counterSavedValue = 22
     ),
     Counter(
         id = 3,
-        counterName = "Name",
-        counterDescription = "Description",
-        counterDate = 0L,
-        counterSavedValue = 0
+        counterName = "CName",
+        counterDescription = "CDescription",
+        counterDate = 3L,
+        counterSavedValue = 33
     )
+)
+
+val testPreferencesString = mapOf(
+    "S_KEY_1" to "Value1",
+    "S_KEY_2" to "Value2",
+    "S_KEY_3" to "Value3"
+)
+
+val testPreferencesInt = mapOf(
+    "I_KEY_1" to 1,
+    "I_KEY_2" to 2,
+    "I_KEY_3" to 3
+)
+
+val testPreferencesBoolean = mapOf(
+    "B_KEY_1" to true,
+    "B_KEY_2" to false,
+    "B_KEY_3" to true
 )

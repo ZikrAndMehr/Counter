@@ -13,7 +13,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 
 @RunWith(MockitoJUnitRunner::class)
@@ -33,11 +32,11 @@ class CounterRepositoryTest {
         val counter = testCounters[0]
         val id = counter.id!!
 
-        whenever(counterDao.counterById(eq(id)))
+        whenever(counterDao.counterById(id))
             .thenReturn(flowOf(counter))
 
         val retrievedCounter = counterRepository.counterById(id).first()
-        verify(counterDao).counterById(eq(id))
+        verify(counterDao).counterById(id)
         assertEquals(counter, retrievedCounter)
     }
 
@@ -55,13 +54,13 @@ class CounterRepositoryTest {
     fun testInsertCounter() = runTest {
         val counter = testCounters[0]
         counterRepository.insertCounter(counter)
-        verify(counterDao).insertCounter(eq(counter))
+        verify(counterDao).insertCounter(counter)
     }
 
     @Test
     fun testDeleteCounter() = runTest {
         val counter = testCounters[0]
         counterRepository.deleteCounter(counter)
-        verify(counterDao).deleteCounter(eq(counter))
+        verify(counterDao).deleteCounter(counter)
     }
 }
