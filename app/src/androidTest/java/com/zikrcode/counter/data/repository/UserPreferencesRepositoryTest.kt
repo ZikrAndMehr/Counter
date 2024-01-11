@@ -4,13 +4,11 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.zikrcode.counter.utils.TEST_DATASTORE_NAME
 import com.zikrcode.counter.utils.testPreferencesBoolean
 import com.zikrcode.counter.utils.testPreferencesInt
 import com.zikrcode.counter.utils.testPreferencesString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -19,15 +17,14 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(AndroidJUnit4::class)
 class UserPreferencesRepositoryTest {
 
     @get:Rule
     val temporaryFolder: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
-    private val testScope = TestScope(UnconfinedTestDispatcher()+ Job())
+
+    private val testScope = TestScope(UnconfinedTestDispatcher())
     private val dataStore = PreferenceDataStoreFactory.create(scope = testScope) {
         temporaryFolder.newFile(TEST_DATASTORE_NAME)
     }

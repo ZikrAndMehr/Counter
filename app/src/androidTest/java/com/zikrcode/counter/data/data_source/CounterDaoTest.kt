@@ -1,8 +1,7 @@
 package com.zikrcode.counter.data.data_source
 
 import androidx.room.Room
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import com.zikrcode.counter.utils.testCounters
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -10,9 +9,7 @@ import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class CounterDaoTest {
 
     private lateinit var counterDatabase: CounterDatabase
@@ -21,7 +18,7 @@ class CounterDaoTest {
     @Before
     fun setup() {
         counterDatabase = Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
+            ApplicationProvider.getApplicationContext(),
             CounterDatabase::class.java
         ).build()
         counterDao = counterDatabase.counterDao
