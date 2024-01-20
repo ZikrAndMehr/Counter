@@ -22,8 +22,9 @@ import com.zikrcode.counter.domain.utils.CounterOrder
 import com.zikrcode.counter.domain.utils.OrderType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class AllCountersUseCase(
+class AllCountersUseCase @Inject constructor(
     private val counterRepository: CounterRepository
 ) {
 

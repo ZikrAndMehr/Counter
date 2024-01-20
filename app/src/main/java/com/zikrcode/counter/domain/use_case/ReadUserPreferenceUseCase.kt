@@ -19,8 +19,9 @@ package com.zikrcode.counter.domain.use_case
 import androidx.datastore.preferences.core.Preferences
 import com.zikrcode.counter.data.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class ReadUserPreferenceUseCase(
+class ReadUserPreferenceUseCase @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
     operator fun <T> invoke(key: Preferences.Key<T>): Flow<T?> {

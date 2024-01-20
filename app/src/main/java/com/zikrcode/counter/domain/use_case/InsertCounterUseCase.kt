@@ -21,8 +21,9 @@ import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.data.repository.CounterRepository
 import com.zikrcode.counter.domain.use_case.counter_validation.CounterValidationResult
 import com.zikrcode.counter.presentation.utils.UiText
+import javax.inject.Inject
 
-class InsertCounterUseCase(
+class InsertCounterUseCase @Inject constructor(
     private val counterRepository: CounterRepository
 ) {
 

@@ -18,8 +18,9 @@ package com.zikrcode.counter.domain.use_case
 
 import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.data.repository.CounterRepository
+import javax.inject.Inject
 
-class DeleteCounterUseCase(
+class DeleteCounterUseCase @Inject constructor(
     private val counterRepository: CounterRepository
 ) {
 

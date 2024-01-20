@@ -18,8 +18,9 @@ package com.zikrcode.counter.domain.use_case
 
 import androidx.datastore.preferences.core.Preferences
 import com.zikrcode.counter.data.repository.UserPreferencesRepository
+import javax.inject.Inject
 
-class WriteUserPreferenceUseCase(
+class WriteUserPreferenceUseCase @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
     suspend operator fun <T> invoke(key: Preferences.Key<T>, value: T) {

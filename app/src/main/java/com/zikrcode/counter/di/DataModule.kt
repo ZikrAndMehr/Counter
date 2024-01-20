@@ -22,18 +22,13 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import com.zikrcode.counter.data.data_source.CounterDao
 import com.zikrcode.counter.data.data_source.CounterDatabase
 import com.zikrcode.counter.data.repository.CounterRepositoryImpl
 import com.zikrcode.counter.data.repository.UserPreferencesRepositoryImpl
 import com.zikrcode.counter.data.repository.CounterRepository
 import com.zikrcode.counter.data.repository.UserPreferencesRepository
-import com.zikrcode.counter.domain.use_case.AllCountersUseCase
-import com.zikrcode.counter.domain.use_case.CounterByIdUseCase
-import com.zikrcode.counter.domain.use_case.CounterUseCases
-import com.zikrcode.counter.domain.use_case.DeleteCounterUseCase
-import com.zikrcode.counter.domain.use_case.InsertCounterUseCase
-import com.zikrcode.counter.domain.use_case.ReadUserPreferenceUseCase
-import com.zikrcode.counter.domain.use_case.WriteUserPreferenceUseCase
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,10 +39,10 @@ private const val USER_PREFERENCES = "user_preferences"
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object DataSourceModule {
 
-    @Provides
     @Singleton
+    @Provides
     fun provideCounterDatabase(application: Application): CounterDatabase {
         return Room.databaseBuilder(
             application,
@@ -56,41 +51,34 @@ object AppModule {
         ).build()
     }
 
-    @Provides
     @Singleton
+    @Provides
+    fun provideCounterDao(counterDatabase: CounterDatabase): CounterDao {
+        return counterDatabase.counterDao
+    }
+
+    @Singleton
+    @Provides
     fun providePreferencesDataStore(application: Application): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create {
             application.preferencesDataStoreFile(USER_PREFERENCES)
         }
     }
+}
 
-    @Provides
-    @Singleton
-    fun provideCounterRepository(counterDatabase: CounterDatabase): CounterRepository {
-        return CounterRepositoryImpl(counterDatabase.counterDao)
-    }
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
 
-    @Provides
     @Singleton
-    fun provideUserPreferencesRepository(
-        dataStore: DataStore<Preferences>
-    ): UserPreferencesRepository {
-        return UserPreferencesRepositoryImpl(dataStore)
-    }
+    @Binds
+    abstract fun bindCounterRepository(
+        counterRepositoryImpl: CounterRepositoryImpl
+    ): CounterRepository
 
-    @Provides
     @Singleton
-    fun provideCounterUseCases(
-        counterRepository: CounterRepository,
-        userPreferencesRepository: UserPreferencesRepository
-    ): CounterUseCases {
-        return CounterUseCases(
-            CounterByIdUseCase(counterRepository),
-            AllCountersUseCase(counterRepository),
-            InsertCounterUseCase(counterRepository),
-            DeleteCounterUseCase(counterRepository),
-            ReadUserPreferenceUseCase(userPreferencesRepository),
-            WriteUserPreferenceUseCase(userPreferencesRepository)
-        )
-    }
+    @Binds
+    abstract fun bindUserPreferencesRepository(
+        userPreferencesRepositoryImpl: UserPreferencesRepositoryImpl
+    ): UserPreferencesRepository
 }

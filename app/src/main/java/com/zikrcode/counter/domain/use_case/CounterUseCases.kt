@@ -16,7 +16,9 @@
 
 package com.zikrcode.counter.domain.use_case
 
-data class CounterUseCases(
+import javax.inject.Inject
+
+data class CounterUseCases @Inject constructor(
     val counterByIdUseCase: CounterByIdUseCase,
     val allCountersUseCase: AllCountersUseCase,
     val insertCounterUseCase: InsertCounterUseCase,
