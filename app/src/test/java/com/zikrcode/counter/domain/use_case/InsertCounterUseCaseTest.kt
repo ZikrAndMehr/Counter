@@ -1,41 +1,32 @@
 package com.zikrcode.counter.domain.use_case
 
-import com.zikrcode.counter.domain.repository.CounterRepository
+import com.zikrcode.counter.data.testdoubles.FakeCounterRepository
 import com.zikrcode.counter.utils.testCounters
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
 
-@RunWith(MockitoJUnitRunner::class)
 class InsertCounterUseCaseTest {
+
+    private val counterRepository = FakeCounterRepository()
+    private val insertCounterUseCase = InsertCounterUseCase(counterRepository)
 
     @Test
     fun testInsertCounter_withBlankCounterName() = runTest {
-        val counterRepository = mock<CounterRepository>()
-        val insertCounterUseCase = InsertCounterUseCase(counterRepository)
-
-        val counter = testCounters[0].copy(counterName = "")
+        val counter = testCounters.first().copy(counterName = "")
         val counterValidationResult = insertCounterUseCase.invoke(counter)
 
-        verify(counterRepository, never()).insertCounter(counter)
+        assertFalse(counterRepository.data.contains(counter))
         assertFalse(counterValidationResult.successful)
         assertNotNull(counterValidationResult.errorMessage)
     }
 
     @Test
     fun testInsertCounter_withValidCounter() = runTest {
-        val counterRepository = mock<CounterRepository>()
-        val insertCounterUseCase = InsertCounterUseCase(counterRepository)
-
-        val counter = testCounters[0]
+        val counter = testCounters.last()
         val counterValidationResult = insertCounterUseCase.invoke(counter)
 
-        verify(counterRepository).insertCounter(counter)
+        assertTrue(counterRepository.data.contains(counter))
         assertTrue(counterValidationResult.successful)
         assertNull(counterValidationResult.errorMessage)
     }

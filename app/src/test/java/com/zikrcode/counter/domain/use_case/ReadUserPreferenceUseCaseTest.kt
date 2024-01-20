@@ -3,76 +3,79 @@ package com.zikrcode.counter.domain.use_case
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.zikrcode.counter.domain.repository.UserPreferencesRepository
+import com.zikrcode.counter.data.testdoubles.FakeUserPreferencesRepository
 import com.zikrcode.counter.utils.testPreferencesBoolean
 import com.zikrcode.counter.utils.testPreferencesInt
 import com.zikrcode.counter.utils.testPreferencesString
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-@RunWith(MockitoJUnitRunner::class)
 class ReadUserPreferenceUseCaseTest {
 
-    private lateinit var userPreferencesRepository: UserPreferencesRepository
-    private lateinit var readUserPreferenceUseCase: ReadUserPreferenceUseCase
+    private val userPreferencesRepository = FakeUserPreferencesRepository()
+    private val readUserPreferenceUseCase = ReadUserPreferenceUseCase(userPreferencesRepository)
 
-    @Before
-    fun setup() {
-        userPreferencesRepository = mock()
-        readUserPreferenceUseCase = ReadUserPreferenceUseCase(userPreferencesRepository)
+    @Test
+    fun testReadUserPreference_returnsNullForNonExistentStringPreferenceKey() = runTest {
+        val key = testPreferencesString.keys.first()
+        val preferenceKey = stringPreferencesKey(key)
+
+        val retrievedValue = readUserPreferenceUseCase.invoke(preferenceKey).first()
+        assertNull(retrievedValue)
     }
 
     @Test
-    fun testReadUserPreference_readsStringPreference() = runTest {
-        val key = testPreferencesString.keys.first()
+    fun testReadUserPreference_returnsValueOfStringPreferenceKey() = runTest {
+        userPreferencesRepository.setTestPreferences(testPreferencesString)
+
+        val key = testPreferencesString.keys.last()
         val value = testPreferencesString[key]
         val preferenceKey = stringPreferencesKey(key)
 
-        whenever(userPreferencesRepository.readUserPreference(preferenceKey))
-            .thenReturn(flowOf(value))
-
         val retrievedValue = readUserPreferenceUseCase.invoke(preferenceKey).first()
-
-        verify(userPreferencesRepository).readUserPreference(preferenceKey)
         assertEquals(value, retrievedValue)
     }
 
     @Test
-    fun testReadUserPreference_readsIntPreference() = runTest {
+    fun testReadUserPreference_returnsNullForNonExistentIntPreferenceKey() = runTest {
         val key = testPreferencesInt.keys.first()
+        val preferenceKey = intPreferencesKey(key)
+
+        val retrievedValue = readUserPreferenceUseCase.invoke(preferenceKey).first()
+        assertNull(retrievedValue)
+    }
+    @Test
+    fun testReadUserPreference_returnsValueOfIntPreferenceKey() = runTest {
+        userPreferencesRepository.setTestPreferences(testPreferencesInt)
+
+        val key = testPreferencesInt.keys.last()
         val value = testPreferencesInt[key]
         val preferenceKey = intPreferencesKey(key)
 
-        whenever(userPreferencesRepository.readUserPreference(preferenceKey))
-            .thenReturn(flowOf(value))
-
         val retrievedValue = readUserPreferenceUseCase.invoke(preferenceKey).first()
-
-        verify(userPreferencesRepository).readUserPreference(preferenceKey)
         assertEquals(value, retrievedValue)
     }
 
     @Test
-    fun testReadUserPreference_readsBooleanPreference() = runTest {
+    fun testReadUserPreference_returnsNullForNonExistentBooleanPreferenceKey() = runTest {
         val key = testPreferencesBoolean.keys.first()
+        val preferenceKey = booleanPreferencesKey(key)
+
+        val retrievedValue = readUserPreferenceUseCase.invoke(preferenceKey).first()
+        assertNull(retrievedValue)
+    }
+
+    @Test
+    fun testReadUserPreference_returnsValueOfBooleanPreferenceKey() = runTest {
+        userPreferencesRepository.setTestPreferences(testPreferencesBoolean)
+
+        val key = testPreferencesBoolean.keys.last()
         val value = testPreferencesBoolean[key]
         val preferenceKey = booleanPreferencesKey(key)
 
-        whenever(userPreferencesRepository.readUserPreference(preferenceKey))
-            .thenReturn(flowOf(value))
-
         val retrievedValue = readUserPreferenceUseCase.invoke(preferenceKey).first()
-
-        verify(userPreferencesRepository).readUserPreference(preferenceKey)
         assertEquals(value, retrievedValue)
     }
 }
