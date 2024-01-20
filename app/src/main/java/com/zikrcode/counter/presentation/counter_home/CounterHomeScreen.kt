@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.zikrcode.counter.R
-import com.zikrcode.counter.domain.model.Counter
+import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.presentation.counter_home.components.CircleButton
 import com.zikrcode.counter.presentation.counter_home.components.CounterItem
 import com.zikrcode.counter.presentation.counter_home.components.DecrementButton

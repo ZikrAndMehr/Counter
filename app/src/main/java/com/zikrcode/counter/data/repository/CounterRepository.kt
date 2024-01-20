@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.zikrcode.counter.domain.repository
+package com.zikrcode.counter.data.repository
 
-import androidx.datastore.preferences.core.Preferences
+import com.zikrcode.counter.data.model.Counter
 import kotlinx.coroutines.flow.Flow
 
-interface UserPreferencesRepository {
+interface CounterRepository {
 
-    fun <T> readUserPreference(key: Preferences.Key<T>): Flow<T?>
+    fun counterById(id: Int): Flow<Counter>
 
-    suspend fun <T> writeUserPreference(key: Preferences.Key<T>, value: T)
+    fun allCounters(): Flow<List<Counter>>
+
+    suspend fun insertCounter(counter: Counter)
+
+    suspend fun deleteCounter(counter: Counter)
 }

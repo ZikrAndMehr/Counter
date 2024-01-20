@@ -25,8 +25,8 @@ import androidx.room.Room
 import com.zikrcode.counter.data.data_source.CounterDatabase
 import com.zikrcode.counter.data.repository.CounterRepositoryImpl
 import com.zikrcode.counter.data.repository.UserPreferencesRepositoryImpl
-import com.zikrcode.counter.domain.repository.CounterRepository
-import com.zikrcode.counter.domain.repository.UserPreferencesRepository
+import com.zikrcode.counter.data.repository.CounterRepository
+import com.zikrcode.counter.data.repository.UserPreferencesRepository
 import com.zikrcode.counter.domain.use_case.AllCountersUseCase
 import com.zikrcode.counter.domain.use_case.CounterByIdUseCase
 import com.zikrcode.counter.domain.use_case.CounterUseCases

@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.zikrcode.counter.R
-import com.zikrcode.counter.domain.model.Counter
+import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.presentation.counter_list.component.CounterGridItem
 import com.zikrcode.counter.presentation.utils.Dimens
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.zikrcode.counter.domain.model
+package com.zikrcode.counter.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

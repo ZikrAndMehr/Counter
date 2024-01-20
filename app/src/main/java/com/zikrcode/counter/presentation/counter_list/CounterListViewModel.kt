@@ -22,7 +22,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zikrcode.counter.R
-import com.zikrcode.counter.domain.model.Counter
+import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.domain.use_case.CounterUseCases
 import com.zikrcode.counter.domain.utils.CounterOrder
 import com.zikrcode.counter.domain.utils.OrderType

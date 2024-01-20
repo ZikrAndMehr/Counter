@@ -17,7 +17,7 @@
 package com.zikrcode.counter.domain.use_case
 
 import androidx.datastore.preferences.core.Preferences
-import com.zikrcode.counter.domain.repository.UserPreferencesRepository
+import com.zikrcode.counter.data.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 
 class ReadUserPreferenceUseCase(

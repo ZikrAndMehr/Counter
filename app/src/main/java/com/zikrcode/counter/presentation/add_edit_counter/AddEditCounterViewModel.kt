@@ -21,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zikrcode.counter.domain.model.Counter
+import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.domain.use_case.CounterUseCases
 import com.zikrcode.counter.presentation.utils.UiText
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG

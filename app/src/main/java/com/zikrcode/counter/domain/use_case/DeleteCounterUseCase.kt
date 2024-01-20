@@ -16,8 +16,8 @@
 
 package com.zikrcode.counter.domain.use_case
 
-import com.zikrcode.counter.domain.model.Counter
-import com.zikrcode.counter.domain.repository.CounterRepository
+import com.zikrcode.counter.data.model.Counter
+import com.zikrcode.counter.data.repository.CounterRepository
 
 class DeleteCounterUseCase(
     private val counterRepository: CounterRepository

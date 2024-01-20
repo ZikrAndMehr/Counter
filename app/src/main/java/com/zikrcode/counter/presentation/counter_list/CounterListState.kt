@@ -16,7 +16,7 @@
 
 package com.zikrcode.counter.presentation.counter_list
 
-import com.zikrcode.counter.domain.model.Counter
+import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.domain.utils.CounterOrder
 import com.zikrcode.counter.domain.utils.OrderType
 
