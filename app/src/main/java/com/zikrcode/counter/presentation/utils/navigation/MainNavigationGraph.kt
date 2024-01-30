@@ -26,11 +26,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
-import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.TITLE_ARG
 import com.zikrcode.counter.presentation.add_edit_counter.AddEditCounterScreen
 import com.zikrcode.counter.presentation.counter_home.CounterHomeScreen
 import com.zikrcode.counter.presentation.counter_list.CounterListScreen
 import com.zikrcode.counter.presentation.counter_settings.CounterSettingsScreen
+import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.EDIT_COUNTER_ARG
 
 @Composable
 fun MainNavigationGraph(
@@ -44,22 +44,56 @@ fun MainNavigationGraph(
         enterTransition = { fadeIn() },
         exitTransition = { fadeOut() }
     ) {
-        composable(Screen.CounterHomeScreen.route) {
-            CounterHomeScreen(navController)
+        composable(
+            route = Screen.CounterHomeScreen.route + "?$COUNTER_ID_ARG={$COUNTER_ID_ARG}",
+            arguments = listOf(
+                navArgument(COUNTER_ID_ARG) {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) {
+            CounterHomeScreen(
+                onCounterEdit = { counterId ->
+                    navController.navigate(
+                        Screen.AddEditCounterScreen.route +
+                                "?$EDIT_COUNTER_ARG=${true}&$COUNTER_ID_ARG=${counterId}"
+                    )
+                }
+            )
         }
         composable(Screen.CounterListScreen.route) {
-            CounterListScreen(navController)
+            CounterListScreen(
+                onCounterSelect = { counterId ->
+                    navController.navigate(
+                        Screen.CounterHomeScreen.route + "?$COUNTER_ID_ARG=${counterId}"
+                    ) {
+                        popUpTo(Screen.CounterHomeScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onCounterEdit = { counterId ->
+                    navController.navigate(
+                        Screen.AddEditCounterScreen.route +
+                                "?$EDIT_COUNTER_ARG=${true}&$COUNTER_ID_ARG=${counterId}"
+                    )
+                },
+                onAddCounter = {
+                    navController.navigate(Screen.AddEditCounterScreen.route)
+                }
+            )
         }
         composable(Screen.CounterSettingsScreen.route) {
-            CounterSettingsScreen(navController)
+            CounterSettingsScreen()
         }
         composable(
             route = Screen.AddEditCounterScreen.route +
-                    "?$TITLE_ARG={$TITLE_ARG}&$COUNTER_ID_ARG={$COUNTER_ID_ARG}",
+                    "?$EDIT_COUNTER_ARG={$EDIT_COUNTER_ARG}&$COUNTER_ID_ARG={$COUNTER_ID_ARG}",
             arguments = listOf(
-                navArgument(TITLE_ARG) {
-                    type = NavType.StringType
-                    nullable = true
+                navArgument(EDIT_COUNTER_ARG) {
+                    type = NavType.BoolType
+                    defaultValue = false
                 },
                 navArgument(COUNTER_ID_ARG) {
                     type = NavType.IntType
@@ -67,10 +101,10 @@ fun MainNavigationGraph(
                 }
             )
         ) { navBackStackEntry ->
-            val title = navBackStackEntry.arguments?.getString(TITLE_ARG)
+            val editCounter = navBackStackEntry.arguments?.getBoolean(EDIT_COUNTER_ARG) ?: false
             AddEditCounterScreen(
-                navController = navController,
-                title = title
+                onBack = { navController.navigateUp() },
+                editCounter = editCounter
             )
         }
     }

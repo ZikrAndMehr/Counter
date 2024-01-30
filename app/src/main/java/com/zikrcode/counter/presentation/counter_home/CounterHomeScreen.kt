@@ -17,26 +17,24 @@
 package com.zikrcode.counter.presentation.counter_home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.zikrcode.counter.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.presentation.counter_home.components.CircleButton
 import com.zikrcode.counter.presentation.counter_home.components.CounterItem
@@ -44,50 +42,23 @@ import com.zikrcode.counter.presentation.counter_home.components.DecrementButton
 import com.zikrcode.counter.presentation.counter_home.components.NoCounterAvailable
 import com.zikrcode.counter.presentation.counter_settings.ChangeScreenVisibility
 import com.zikrcode.counter.presentation.utils.Dimens
-import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
-import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.TITLE_ARG
-import com.zikrcode.counter.presentation.utils.navigation.Screen
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CounterHomeScreen(
-    navController: NavController,
+    onCounterEdit: (Int) -> Unit,
     viewModel: CounterHomeViewModel = hiltViewModel()
 ) {
-    var noCounter by rememberSaveable {
-        mutableStateOf(false)
-    }
-    val editCounterTitle = stringResource(R.string.edit_counter)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                CounterHomeViewModel.UiEvent.NoCounter -> {
-                    noCounter = true
-                }
-                is CounterHomeViewModel.UiEvent.EditCounter -> {
-                    navController.navigate(
-                        Screen.AddEditCounterScreen.route +
-                                "?$TITLE_ARG=${editCounterTitle}&$COUNTER_ID_ARG=${event.counter.id}"
-                    )
-                }
-            }
-        }
-    }
+    CounterHomeContent(
+        loading = uiState.isLoading,
+        counter = uiState.counter,
+        vibrate = uiState.vibrateOnTap,
+        onCounterEdit = onCounterEdit,
+        onEventClick = viewModel::onEvent
+    )
 
-    if (noCounter) {
-        NoCounterAvailable()
-    }
-
-    viewModel.counter.value?.let {
-        CounterHomeContent(
-            counter = it,
-            vibrate = viewModel.vibrateOnTap.value,
-            onEventClick = viewModel::onEvent
-        )
-    }
-
-    ChangeScreenVisibility(viewModel.keepScreenOn.value)
+    ChangeScreenVisibility(uiState.keepScreenOn)
 }
 
 @Preview(
@@ -98,46 +69,65 @@ fun CounterHomeScreen(
 @Composable
 fun CounterHomeContentPreview() {
     CounterHomeContent(
+        loading = false,
         counter = Counter.instance(),
         vibrate = false,
+        onCounterEdit = { },
         onEventClick = { }
     )
 }
 
 @Composable
 private fun CounterHomeContent(
-    counter: Counter,
+    loading: Boolean,
+    counter: Counter?,
     vibrate: Boolean,
+    onCounterEdit: (Int) -> Unit,
     onEventClick: (CounterHomeEvent) -> Unit
 ) {
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimens.SpacingSingle),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+    if (loading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            CounterItem(
-                counter = counter,
-                onEditClick = {
-                    onEventClick(CounterHomeEvent.Edit(counter))
-                },
-                onResetClick = {
-                    onEventClick(CounterHomeEvent.Reset)
-                }
+            CircularProgressIndicator(
+                modifier = Modifier.width(Dimens.SpacingQuadruple),
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
-            Spacer(Modifier.height(Dimens.SpacingSingle))
-            CircleButton(
-                modifier = Modifier.weight(1f),
-                vibrate = vibrate,
-                currentValue = counter.counterSavedValue
-            ) {
-                onEventClick(CounterHomeEvent.Increment)
-            }
-            Spacer(Modifier.height(Dimens.SpacingSingle))
-            DecrementButton {
-                onEventClick(CounterHomeEvent.Decrement)
+        }
+    } else {
+        if (counter == null) {
+            NoCounterAvailable()
+        } else {
+            Surface {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(Dimens.SpacingSingle),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CounterItem(
+                        counter = counter,
+                        onEditClick = { onCounterEdit(counter.id!!) },
+                        onResetClick = {
+                            onEventClick(CounterHomeEvent.Reset)
+                        }
+                    )
+                    Spacer(Modifier.height(Dimens.SpacingSingle))
+                    CircleButton(
+                        modifier = Modifier.weight(1f),
+                        vibrate = vibrate,
+                        currentValue = counter.counterSavedValue
+                    ) {
+                        onEventClick(CounterHomeEvent.Increment)
+                    }
+                    Spacer(Modifier.height(Dimens.SpacingSingle))
+                    DecrementButton {
+                        onEventClick(CounterHomeEvent.Decrement)
+                    }
+                }
             }
         }
     }

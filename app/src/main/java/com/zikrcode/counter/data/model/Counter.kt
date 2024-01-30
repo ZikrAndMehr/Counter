@@ -25,8 +25,8 @@ data class Counter(
     @PrimaryKey val id: Int? = null,
     @ColumnInfo(name = "counter_name") val counterName: String,
     @ColumnInfo(name = "counter_description") val counterDescription: String,
-    @ColumnInfo(name = "counter_date") val counterDate: Long,
-    @ColumnInfo(name = "counter_saved_value") val counterSavedValue: Int
+    @ColumnInfo(name = "counter_saved_value") val counterSavedValue: Int,
+    @ColumnInfo(name = "counter_date") val counterDate: Long
 ) {
     companion object {
 

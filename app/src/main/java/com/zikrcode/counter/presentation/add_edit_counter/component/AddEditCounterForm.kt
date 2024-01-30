@@ -26,9 +26,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -43,16 +40,14 @@ import com.zikrcode.counter.presentation.utils.Dimens
 @Composable
 fun AddEditCounterForm(
     modifier: Modifier = Modifier,
-    counterNameState: State<String>,
+    counterName: String,
     onCounterNameChange: (String) -> Unit,
-    counterDescriptionState: State<String>,
+    counterDescription: String,
     onCounterDescriptionChange: (String) -> Unit,
-    counterValueState: State<String>,
-    onCounterValueChange: (String) -> Unit
+    counterValue: Int?,
+    onCounterValueChange: (Int?) -> Unit
 ) {
-    Column(
-        modifier = modifier
-    ) {
+    Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -63,10 +58,8 @@ fun AddEditCounterForm(
                 )
         ) {
             OutlinedTextField(
-                value = counterNameState.value,
-                onValueChange = {
-                    onCounterNameChange(it)
-                },
+                value = counterName,
+                onValueChange = { onCounterNameChange(it) },
                 modifier = Modifier.weight(1f),
                 label = {
                     Text(text = stringResource(R.string.counter_name))
@@ -76,15 +69,13 @@ fun AddEditCounterForm(
             )
             Spacer(Modifier.width(Dimens.SpacingDouble))
             OutlinedTextField(
-                value = counterValueState.value,
+                value = counterValue?.toString() ?: "",
                 onValueChange = {
                     if (it.isDigitsOnly() && it.length <= MAX_COUNTER_VALUE_LENGTH) {
-                        onCounterValueChange(it)
+                        onCounterValueChange(it.toIntOrNull())
                     }
                 },
-                modifier = Modifier.width(
-                    Dimens.SpacingDouble * MAX_COUNTER_VALUE_LENGTH
-                ),
+                modifier = Modifier.width(Dimens.SpacingDouble * MAX_COUNTER_VALUE_LENGTH),
                 textStyle = TextStyle(textAlign = TextAlign.Center),
                 label = {
                     Text(text = stringResource(R.string.counter_value))
@@ -95,10 +86,8 @@ fun AddEditCounterForm(
             )
         }
         OutlinedTextField(
-            value = counterDescriptionState.value,
-            onValueChange = {
-                onCounterDescriptionChange(it)
-            },
+            value = counterDescription,
+            onValueChange = { onCounterDescriptionChange(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Dimens.SpacingSingle),
@@ -114,13 +103,12 @@ fun AddEditCounterForm(
 @Preview
 @Composable
 fun AddCounterFormPreview() {
-    val state = remember { mutableStateOf("") }
     AddEditCounterForm(
-        counterNameState = state,
+        counterName = "",
         onCounterNameChange = { },
-        counterDescriptionState = state,
+        counterDescription = "",
         onCounterDescriptionChange = { },
-        counterValueState = state,
+        counterValue = 0,
         onCounterValueChange = { }
     )
 }

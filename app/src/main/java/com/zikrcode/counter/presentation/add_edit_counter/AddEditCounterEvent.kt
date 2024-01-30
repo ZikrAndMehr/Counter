@@ -20,13 +20,11 @@ sealed class AddEditCounterEvent {
 
     data class EnteredName(val value: String) : AddEditCounterEvent()
 
-    data class EnteredValue(val value: String) : AddEditCounterEvent()
-
     data class EnteredDescription(val value: String) : AddEditCounterEvent()
 
-    object GoBack : AddEditCounterEvent()
+    data class EnteredValue(val value: Int?) : AddEditCounterEvent()
 
-    object Cancel : AddEditCounterEvent()
+    data object Cancel : AddEditCounterEvent()
 
-    object Save : AddEditCounterEvent()
+    data object Save : AddEditCounterEvent()
 }

@@ -24,9 +24,11 @@ import androidx.compose.ui.platform.LocalContext
 @Composable
 fun ChangeScreenVisibility(keepScreenOn: Boolean) {
     val activity = LocalContext.current as Activity
-    if (keepScreenOn) {
-        activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-    } else {
-        activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    activity.window.apply {
+        if (keepScreenOn) {
+            addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
     }
 }

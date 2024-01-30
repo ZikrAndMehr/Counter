@@ -16,8 +16,6 @@
 
 package com.zikrcode.counter.presentation.add_edit_counter
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,11 +24,22 @@ import com.zikrcode.counter.domain.use_case.CounterUseCases
 import com.zikrcode.counter.presentation.utils.UiText
 import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class AddEditCounterUiState(
+    val counterName: String = "",
+    val counterDescription: String = "",
+    val counterValue: Int? = null,
+    val isLoading: Boolean = false,
+    val userMessage: UiText? = null,
+    val isCounterCanceled: Boolean = false,
+    val isCounterSaved: Boolean = false
+)
 
 @HiltViewModel
 class AddEditCounterViewModel @Inject constructor(
@@ -38,87 +47,78 @@ class AddEditCounterViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private var currentCounterId: Int? = null
+    private val counterId: Int? = savedStateHandle[COUNTER_ID_ARG]
+        get() = field.takeIf { it != -1 }
 
-    private val _counterName = mutableStateOf("")
-    val counterName: State<String> = _counterName
-
-    private val _counterDescription = mutableStateOf("")
-    val counterDescription: State<String> = _counterDescription
-
-    private val _counterValue = mutableStateOf("")
-    val counterValue: State<String> = _counterValue
-
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _uiState = MutableStateFlow(AddEditCounterUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
-        savedStateHandle.get<Int>(COUNTER_ID_ARG)?.let { counterId ->
-            if (counterId != -1) {
-                viewModelScope.launch {
-                    counterUseCases.counterByIdUseCase(counterId).first().also { counter ->
-                        currentCounterId = counter.id
-                        _counterName.value = counter.counterName
-                        _counterDescription.value = counter.counterDescription
-                        _counterValue.value = counter.counterSavedValue.toString()
-                    }
+        counterId?.let { loadCounter(it) }
+    }
+    
+    private fun loadCounter(counterId: Int) {
+        _uiState.update {
+            it.copy(isLoading = true)
+        }
+        viewModelScope.launch {
+            counterUseCases.counterByIdUseCase(counterId).first().let { counter ->
+                _uiState.update {
+                    it.copy(
+                        counterName = counter.counterName,
+                        counterDescription = counter.counterDescription,
+                        counterValue = counter.counterSavedValue,
+                        isLoading = false
+                    )
                 }
             }
         }
     }
 
     fun onEvent(addEditCounterEvent: AddEditCounterEvent) {
-
         when (addEditCounterEvent) {
             is AddEditCounterEvent.EnteredName -> {
-                _counterName.value = addEditCounterEvent.value
-            }
-            is AddEditCounterEvent.EnteredValue -> {
-                _counterValue.value = addEditCounterEvent.value
+                _uiState.update {
+                    it.copy(counterName = addEditCounterEvent.value)
+                }
             }
             is AddEditCounterEvent.EnteredDescription -> {
-                _counterDescription.value = addEditCounterEvent.value
+                _uiState.update {
+                    it.copy(counterDescription = addEditCounterEvent.value)
+                }
             }
-            AddEditCounterEvent.GoBack -> {
-                viewModelScope.launch {
-                    _eventFlow.emit(UiEvent.NavigateBack)
+            is AddEditCounterEvent.EnteredValue -> {
+                _uiState.update {
+                    it.copy(counterValue = addEditCounterEvent.value)
                 }
             }
             AddEditCounterEvent.Cancel -> {
-                viewModelScope.launch {
-                    _eventFlow.emit(UiEvent.CounterCanceled)
+                _uiState.update {
+                    it.copy(isCounterCanceled = true)
                 }
             }
             AddEditCounterEvent.Save -> {
                 viewModelScope.launch {
-                    val counterValidationResult = counterUseCases.insertCounterUseCase(
+                    val counter = _uiState.value.let { state ->
                         Counter(
-                            id = currentCounterId,
-                            counterName = counterName.value,
-                            counterDescription = counterDescription.value,
-                            counterDate = System.currentTimeMillis(),
-                            counterSavedValue = counterValue.value.toIntOrNull() ?: 0
+                            id = counterId,
+                            counterName = state.counterName,
+                            counterDescription = state.counterDescription,
+                            counterSavedValue = state.counterValue ?: 0,
+                            counterDate = System.currentTimeMillis()
                         )
-                    )
+                    }
+                    val counterValidationResult = counterUseCases.insertCounterUseCase(counter)
 
-                    counterValidationResult.errorMessage?.let {
-                        _eventFlow.emit(UiEvent.ShowSnackbar(it))
-                    } ?: run {
-                        _eventFlow.emit(UiEvent.CounterSaved)
+                    _uiState.update {
+                        if (counterValidationResult.successful) {
+                            it.copy(isCounterSaved = true)
+                        } else {
+                            it.copy(userMessage = counterValidationResult.errorMessage)
+                        }
                     }
                 }
             }
         }
-    }
-
-    sealed class UiEvent {
-
-        data class ShowSnackbar(val message: UiText) : UiEvent()
-
-        object NavigateBack : UiEvent()
-
-        object CounterCanceled : UiEvent()
-
-        object CounterSaved : UiEvent()
     }
 }

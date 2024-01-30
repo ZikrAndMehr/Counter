@@ -31,6 +31,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,59 +41,37 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zikrcode.counter.R
 import com.zikrcode.counter.data.model.Counter
 import com.zikrcode.counter.presentation.counter_list.component.CounterGridItem
 import com.zikrcode.counter.presentation.utils.Dimens
-import com.zikrcode.counter.presentation.utils.navigation.MainNavigationArgs.COUNTER_ID_ARG
-import com.zikrcode.counter.presentation.utils.navigation.Screen
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CounterListScreen(
-    navController: NavController,
+    onCounterSelect: (Int) -> Unit,
+    onCounterEdit: (Int) -> Unit,
+    onAddCounter: () -> Unit,
     viewModel: CounterListViewModel = hiltViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
-
-    LaunchedEffect(true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when(event) {
-                is CounterListViewModel.UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.message.asString(context)
-                    )
-                }
-                is CounterListViewModel.UiEvent.CounterSelected -> {
-                    navController.navigate(Screen.CounterHomeScreen.route) {
-                        popUpTo(Screen.CounterHomeScreen.route) {
-                            saveState = true
-                        }
-                        restoreState = true
-                    }
-                }
-                is CounterListViewModel.UiEvent.EditCounter -> {
-                    navController.navigate(
-                        Screen.AddEditCounterScreen.route +
-                                "?${COUNTER_ID_ARG}=${event.counter.id}"
-                    )
-                }
-                CounterListViewModel.UiEvent.CreateNewCounter -> {
-                    navController.navigate(Screen.AddEditCounterScreen.route)
-                }
-            }
-        }
-    }
-
-    val state = viewModel.state.value
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     CounterListContent(
         snackbarHostState = snackbarHostState,
-        state = state,
-        onEventClick = viewModel::onEvent
+        allCounters = uiState.allCounters,
+        onCounterSelect = onCounterSelect,
+        onCounterEdit = onCounterEdit,
+        onAddCounter = onAddCounter,
+        onEvent = viewModel::onEvent
     )
+
+    val context = LocalContext.current
+    uiState.userMessage?.let { uiText ->
+        LaunchedEffect(uiText) {
+            snackbarHostState.showSnackbar(message = uiText.asString(context))
+        }
+    }
 }
 
 @Preview(
@@ -104,26 +83,28 @@ fun CounterListScreen(
 fun CounterListContentPreview() {
     CounterListContent(
         snackbarHostState = SnackbarHostState(),
-        state = CounterListState(),
-        onEventClick = { }
+        allCounters = listOf(),
+        onCounterSelect = { },
+        onCounterEdit = { },
+        onAddCounter = { },
+        onEvent = { }
     )
 }
 
 @Composable
 private fun CounterListContent(
     snackbarHostState: SnackbarHostState,
-    state: CounterListState,
-    onEventClick: (CounterListEvent) -> Unit
+    allCounters: List<Counter>,
+    onCounterSelect: (Int) -> Unit,
+    onCounterEdit: (Int) -> Unit,
+    onAddCounter: () -> Unit,
+    onEvent: (CounterListEvent) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
-            CounterListScreenFAB {
-                onEventClick(CounterListEvent.NewCounter)
-            }
+            CounterListScreenFAB { onAddCounter() }
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0.dp)
     ) {
         Column(
@@ -133,8 +114,10 @@ private fun CounterListContent(
                 .padding(Dimens.SpacingSingle)
         ) {
             CounterListStaggeredGrid(
-                counters = state.allCounters,
-                onEventClick = onEventClick
+                allCounters = allCounters,
+                onCounterSelect = onCounterSelect,
+                onCounterEdit = onCounterEdit,
+                onEvent = onEvent
             )
         }
     }
@@ -157,24 +140,22 @@ private fun CounterListScreenFAB(
 
 @Composable
 private fun CounterListStaggeredGrid(
-    counters: List<Counter>,
-    onEventClick: (CounterListEvent) -> Unit
+    allCounters: List<Counter>,
+    onCounterSelect: (Int) -> Unit,
+    onCounterEdit: (Int) -> Unit,
+    onEvent: (CounterListEvent) -> Unit
 ) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2)
     ) {
-        items(counters) { counter ->
+        items(allCounters) { counter ->
             CounterGridItem(
                 counter = counter,
-                onClick = {
-                    onEventClick(CounterListEvent.SelectCounter(counter))
-                },
+                onClick = { onCounterSelect(counter.id!!) },
                 onDeleteClick = {
-                    onEventClick(CounterListEvent.Delete(counter))
+                    onEvent(CounterListEvent.DeleteCounter(counter))
                 },
-                onEditClick = {
-                    onEventClick(CounterListEvent.Edit(counter))
-                }
+                onEditClick = { onCounterEdit(counter.id!!) }
             )
         }
     }
