@@ -75,10 +75,12 @@ class CounterListViewModel @Inject constructor(
     fun onEvent(counterListEvent: CounterListEvent) {
         when (counterListEvent) {
             CounterListEvent.ToggleOrderSection -> {
-
+                _uiState.update {
+                    it.copy(isOrderSectionVisible = !it.isOrderSectionVisible)
+                }
             }
             is CounterListEvent.Order -> {
-
+                loadAllCounters(counterListEvent.counterOrder)
             }
             is CounterListEvent.DeleteCounter -> {
                 viewModelScope.launch {
@@ -99,6 +101,12 @@ class CounterListViewModel @Inject constructor(
             CounterListEvent.RestoreCounter -> {
 
             }
+        }
+    }
+
+    fun snackbarMessageShown() {
+        _uiState.update {
+            it.copy(userMessage = null)
         }
     }
 }

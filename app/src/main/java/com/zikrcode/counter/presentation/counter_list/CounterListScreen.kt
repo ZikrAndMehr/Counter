@@ -16,6 +16,9 @@
 
 package com.zikrcode.counter.presentation.counter_list
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,7 +47,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zikrcode.counter.R
 import com.zikrcode.counter.data.model.Counter
+import com.zikrcode.counter.domain.utils.CounterOrder
+import com.zikrcode.counter.domain.utils.OrderType
 import com.zikrcode.counter.presentation.counter_list.component.CounterGridItem
+import com.zikrcode.counter.presentation.counter_list.component.CounterListHeader
+import com.zikrcode.counter.presentation.counter_list.component.OrderSection
 import com.zikrcode.counter.presentation.utils.Dimens
 
 @Composable
@@ -59,6 +66,8 @@ fun CounterListScreen(
 
     CounterListContent(
         snackbarHostState = snackbarHostState,
+        counterOrder = uiState.counterOrder,
+        orderSectionVisible = uiState.isOrderSectionVisible,
         allCounters = uiState.allCounters,
         onCounterSelect = onCounterSelect,
         onCounterEdit = onCounterEdit,
@@ -70,6 +79,7 @@ fun CounterListScreen(
     uiState.userMessage?.let { uiText ->
         LaunchedEffect(uiText) {
             snackbarHostState.showSnackbar(message = uiText.asString(context))
+            viewModel.snackbarMessageShown()
         }
     }
 }
@@ -83,6 +93,8 @@ fun CounterListScreen(
 fun CounterListContentPreview() {
     CounterListContent(
         snackbarHostState = SnackbarHostState(),
+        counterOrder = CounterOrder.Date(OrderType.DESCENDING),
+        orderSectionVisible = false,
         allCounters = listOf(),
         onCounterSelect = { },
         onCounterEdit = { },
@@ -94,6 +106,8 @@ fun CounterListContentPreview() {
 @Composable
 private fun CounterListContent(
     snackbarHostState: SnackbarHostState,
+    counterOrder: CounterOrder,
+    orderSectionVisible: Boolean,
     allCounters: List<Counter>,
     onCounterSelect: (Int) -> Unit,
     onCounterEdit: (Int) -> Unit,
@@ -113,6 +127,24 @@ private fun CounterListContent(
                 .padding(it)
                 .padding(Dimens.SpacingSingle)
         ) {
+            CounterListHeader(
+                orderSectionVisible = orderSectionVisible,
+                onToggleOrderSection = {
+                    onEvent(CounterListEvent.ToggleOrderSection)
+                }
+            )
+            AnimatedVisibility(
+                visible = orderSectionVisible,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                OrderSection(
+                    counterOrder = counterOrder,
+                    onOrderChange = { newCounterOrder ->
+                        onEvent(CounterListEvent.Order(newCounterOrder))
+                    }
+                )
+            }
             CounterListStaggeredGrid(
                 allCounters = allCounters,
                 onCounterSelect = onCounterSelect,
