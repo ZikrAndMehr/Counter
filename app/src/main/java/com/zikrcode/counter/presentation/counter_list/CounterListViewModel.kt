@@ -41,6 +41,7 @@ data class CounterListUiState(
     val allCounters: List<Counter> = emptyList(),
     val counterOrder: CounterOrder = CounterOrder.Date(OrderType.DESCENDING),
     val isOrderSectionVisible: Boolean = false,
+    val recentlyDeletedCounter: Counter? = null,
     val userMessage: UiText? = null
 )
 
@@ -90,23 +91,37 @@ class CounterListViewModel @Inject constructor(
                     if (counterListEvent.counter.id == currentCounterId) {
                         _uiState.update {
                             it.copy(
-                                userMessage =  UiText.StringResource(R.string.current_counter_in_use)
+                                userMessage = UiText.StringResource(R.string.current_counter_in_use)
                             )
                         }
                     } else {
                         counterUseCases.deleteCounterUseCase(counterListEvent.counter)
+                        _uiState.update {
+                            it.copy(recentlyDeletedCounter = counterListEvent.counter)
+                        }
                     }
                 }
             }
             CounterListEvent.RestoreCounter -> {
-
+                viewModelScope.launch {
+                    _uiState.value.recentlyDeletedCounter?.let {
+                        counterUseCases.insertCounterUseCase(it)
+                    }
+                    _uiState.update {
+                        it.copy(recentlyDeletedCounter = null)
+                    }
+                }
             }
-        }
-    }
-
-    fun snackbarMessageShown() {
-        _uiState.update {
-            it.copy(userMessage = null)
+            CounterListEvent.FinishDeleteCounter -> {
+                _uiState.update {
+                    it.copy(recentlyDeletedCounter = null)
+                }
+            }
+            CounterListEvent.UserMessageShown -> {
+                _uiState.update {
+                    it.copy(userMessage = null)
+                }
+            }
         }
     }
 }

@@ -30,8 +30,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,11 +77,33 @@ fun CounterListScreen(
         onEvent = viewModel::onEvent
     )
 
+    val snackbarMessage = stringResource(R.string.counter_deleted)
+    val snackbarActionLabel = stringResource(R.string.undo)
     val context = LocalContext.current
-    uiState.userMessage?.let { uiText ->
-        LaunchedEffect(uiText) {
-            snackbarHostState.showSnackbar(message = uiText.asString(context))
-            viewModel.snackbarMessageShown()
+
+    uiState.apply {
+        recentlyDeletedCounter?.let { counter ->
+            LaunchedEffect(counter) {
+                val result = snackbarHostState.showSnackbar(
+                    message = snackbarMessage,
+                    actionLabel = snackbarActionLabel,
+                    duration = SnackbarDuration.Long
+                )
+                when (result) {
+                    SnackbarResult.Dismissed -> {
+                        viewModel.onEvent(CounterListEvent.FinishDeleteCounter)
+                    }
+                    SnackbarResult.ActionPerformed -> {
+                        viewModel.onEvent(CounterListEvent.RestoreCounter)
+                    }
+                }
+            }
+        }
+        userMessage?.let { uiText ->
+            LaunchedEffect(uiText) {
+                snackbarHostState.showSnackbar(message = uiText.asString(context))
+                viewModel.onEvent(CounterListEvent.UserMessageShown)
+            }
         }
     }
 }
@@ -149,7 +173,9 @@ private fun CounterListContent(
                 allCounters = allCounters,
                 onCounterSelect = onCounterSelect,
                 onCounterEdit = onCounterEdit,
-                onEvent = onEvent
+                onCounterDelete = { counter ->
+                    onEvent(CounterListEvent.DeleteCounter(counter))
+                }
             )
         }
     }
@@ -175,7 +201,7 @@ private fun CounterListStaggeredGrid(
     allCounters: List<Counter>,
     onCounterSelect: (Int) -> Unit,
     onCounterEdit: (Int) -> Unit,
-    onEvent: (CounterListEvent) -> Unit
+    onCounterDelete: (Counter) -> Unit
 ) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2)
@@ -184,9 +210,7 @@ private fun CounterListStaggeredGrid(
             CounterGridItem(
                 counter = counter,
                 onClick = { onCounterSelect(counter.id!!) },
-                onDeleteClick = {
-                    onEvent(CounterListEvent.DeleteCounter(counter))
-                },
+                onDeleteClick = { onCounterDelete(counter) },
                 onEditClick = { onCounterEdit(counter.id!!) }
             )
         }

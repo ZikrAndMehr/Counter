@@ -28,4 +28,8 @@ sealed class CounterListEvent {
     data class DeleteCounter(val counter: Counter) : CounterListEvent()
 
     data object RestoreCounter : CounterListEvent()
+
+    data object FinishDeleteCounter : CounterListEvent()
+
+    data object UserMessageShown : CounterListEvent()
 }
